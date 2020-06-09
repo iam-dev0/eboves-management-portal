@@ -86,6 +86,13 @@ export default defineConfig({
                   component: './Products',
                   // authority: ['admin'],
                 },
+                {
+                  path: '/brands',
+                  name: 'Brands',
+                  icon: 'smile',
+                  component: './Brands',
+                  // authority: ['admin'],
+                },
               ],
             },
             {

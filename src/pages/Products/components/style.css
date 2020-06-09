@@ -1,0 +1,42 @@
+.card {
+  margin-bottom: 24px;
+}
+.card :global .ant-legacy-form-item .ant-legacy-form-item-control-wrapper {
+  width: 100%;
+}
+.errorIcon {
+  margin-right: 24px;
+  cursor: pointer;
+}
+.errorIcon span.anticon {
+  margin-right: 4px;
+}
+.errorPopover :global .ant-popover-inner-content {
+  min-width: 256px;
+  max-height: 290px;
+  padding: 0;
+  overflow: auto;
+}
+.errorListItem {
+  padding: 8px 16px;
+  list-style: none;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.errorListItem:last-child {
+  border: 0;
+}
+.errorListItem .errorIcon {
+  float: left;
+  margin-top: 4px;
+  margin-right: 12px;
+  padding-bottom: 22px;
+}
+.errorListItem .errorField {
+  margin-top: 2px;
+  font-size: 12px;
+}
+.editable td {
+  padding-top: 13px !important;
+  padding-bottom: 12.5px !important;
+}
