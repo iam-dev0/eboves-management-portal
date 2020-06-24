@@ -1,10 +1,9 @@
 import { Effect, Reducer } from 'umi';
 import { getAllBrands } from './service';
-
-import { BasicListItemDataType } from './data.d';
+// import { BasicListItemDataType } from './data.d';
 
 export interface StateType {
-  list: BasicListItemDataType[];
+  list: any[];
 }
 
 export interface ModelType {

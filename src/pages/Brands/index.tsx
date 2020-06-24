@@ -4,11 +4,11 @@ import { Table, Row, Button, Space, Col, Input, Badge } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { connect, Dispatch } from 'umi';
 import style from './index.less';
-import { StateType } from './modal';
+import { StateType } from './model';
 
 interface BasicListProps {
   brands: StateType;
-  dispatch: Dispatch<any>;
+  dispatch: Dispatch;
   loading: boolean;
 }
 
