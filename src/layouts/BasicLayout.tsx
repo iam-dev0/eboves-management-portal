@@ -7,6 +7,7 @@ import ProLayout, {
   MenuDataItem,
   BasicLayoutProps as ProLayoutProps,
   Settings,
+  SettingDrawer,
   DefaultFooter,
 } from '@ant-design/pro-layout';
 import React, { useEffect } from 'react';
@@ -162,6 +163,16 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
       <Authorized authority={authorized!.authority} noMatch={noMatch}>
         {children}
       </Authorized>
+      <SettingDrawer
+        hideColors={false}
+        settings={settings}
+        onSettingChange={(config) =>
+          dispatch({
+            type: 'settings/changeSetting',
+            payload: config,
+          })
+        }
+      />
     </ProLayout>
   );
 };
