@@ -8,7 +8,7 @@ export interface StateType {
 
 export interface ModelType {
   namespace: string;
-  state: StateType;
+  state: any;
   effects: {
     fetch: Effect;
   };
