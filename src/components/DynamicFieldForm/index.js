@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Form, Button } from 'antd';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+
 class DynamicFields extends Component {
   id = 1;
 

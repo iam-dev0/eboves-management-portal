@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form,Button, Input, Modal, Select, Steps, Row, Col, Spin,Tag } from 'antd';
+import { Form, Button, Input, Modal, Select, Steps, Row, Col, Spin, Tag } from 'antd';
 import { FormInstance } from 'antd/lib/form';
 import CreateVariation from './CreateVariationFrom';
 import {
@@ -138,7 +138,7 @@ const CreateForm: React.FC<CreateFormProps> = ({ onClose, Open }) => {
               <CreateVariation
                 createNewVariation={createNewVariation}
                 // eslint-disable-next-line no-unneeded-ternary
-                showRemove={variationForms.length > 1 ? true : false}
+                showRemove={variationForms.length > 1}
                 key={index}
                 attributes={productForm.getFieldValue('attributes')}
                 sn={index}
@@ -282,14 +282,12 @@ const CreateForm: React.FC<CreateFormProps> = ({ onClose, Open }) => {
                   optionFilterProp="optionLable"
                   style={{ width: '100%' }}
                 >
-                  {allAttributes.map(
-                    (attribute: { id: number; name: string; type: string }) => (
-                      <Option key={attribute.id} value={attribute.id} optionLable={attribute.name}>
-                        {attribute.name} &nbsp;
-                        <Tag color="blue"> {attribute.type}</Tag>
-                      </Option>
-                    ),
-                  )}
+                  {allAttributes.map((attribute: { id: number; name: string; type: string }) => (
+                    <Option key={attribute.id} value={attribute.id} optionLable={attribute.name}>
+                      {attribute.name} &nbsp;
+                      <Tag color="blue"> {attribute.type}</Tag>
+                    </Option>
+                  ))}
                 </Select>
               </FormItem>
             </Col>
