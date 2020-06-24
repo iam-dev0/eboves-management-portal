@@ -19,7 +19,7 @@ const Brands: React.FC<BasicListProps> = (props) => {
   const {
     loading,
     dispatch,
-    // brands: { list },
+    brands: { list },
   } = props;
 
   useEffect(() => {
@@ -64,9 +64,9 @@ const Brands: React.FC<BasicListProps> = (props) => {
     },
   ];
 
-  const onSelectChange = (selectedRowKeys) => {
+  const onSelectChange = (selectedRowKeys, selectedRows) => {
     console.log('selectedRowKeys changed: ', selectedRowKeys);
-    this.setState({ selectedRowKeys });
+    SetselectedRowKeys(selectedRowKeys);
   };
 
   const header = () => (
@@ -91,10 +91,11 @@ const Brands: React.FC<BasicListProps> = (props) => {
   return (
     <PageHeaderWrapper>
       <Table
+        rowKey="id"
         loading={loading}
         rowSelection={rowSelection}
         columns={columns}
-        dataSource={[]}
+        dataSource={list}
         title={header}
       />
       ;
