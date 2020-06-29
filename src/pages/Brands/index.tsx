@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Table, Row, Button, Space, Col, Input, Badge } from 'antd';
+import { Table, Row, Button, Space, Col, Input, Badge, Avatar } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
 import { connect, Dispatch } from 'umi';
 import style from './index.less';
 import { StateType } from './model';
@@ -52,6 +53,17 @@ const Brands: React.FC<BasicListProps> = (props) => {
     {
       title: 'Created',
       dataIndex: 'createdAt',
+      render: (text: string) => {
+        return text ? (
+          <div>
+            <span>
+              <Avatar size="small">User</Avatar> <span> User Name</span>
+            </span>{' '}
+            <br />
+            <span>{dayjs(text).format('DD-MMM-YY hh:mm')}</span>
+          </div>
+        ) : null;
+      },
     },
     {
       title: 'Action',
@@ -98,7 +110,6 @@ const Brands: React.FC<BasicListProps> = (props) => {
         dataSource={list}
         title={header}
       />
-      ;
     </PageHeaderWrapper>
   );
 };

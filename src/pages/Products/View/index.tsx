@@ -1,83 +1,13 @@
 import { DownOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Switch, Dropdown, Menu, message, Input } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
+import { history, } from 'umi';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import ProTable, { ProColumns, ActionType, IntlProvider, enUSIntl } from '@ant-design/pro-table';
 import { SorterResult } from 'antd/es/table/interface';
-
-import CreateForm from './components/CreateForm';
-import UpdateForm, { FormValueType } from './components/UpdateForm';
 import { TableListItem } from './data.d';
 import { fetchProducts, getAllBrands } from './service';
 
-
-
-
-
-
-
-
-// /**
-//  * 添加节点
-//  * @param fields
-//  */
-// const handleAdd = async (fields: TableListItem) => {
-//   const hide = message.loading('正在添加');
-//   try {
-//     await addRule({ ...fields });
-//     hide();
-//     message.success('添加成功');
-//     return true;
-//   } catch (error) {
-//     hide();
-//     message.error('添加失败请重试！');
-//     return false;
-//   }
-// };
-
-// /**
-//  * 更新节点
-//  * @param fields
-//  */
-// const handleUpdate = async (fields: FormValueType) => {
-//   const hide = message.loading('正在配置');
-//   try {
-//     await updateRule({
-//       name: fields.name,
-//       brandId: fields.brandId,
-//       productType: fields.productType,
-//     });
-//     hide();
-
-//     message.success('配置成功');
-//     return true;
-//   } catch (error) {
-//     hide();
-//     message.error('配置失败请重试！');
-//     return false;
-//   }
-// };
-
-// /**
-//  *  删除节点
-//  * @param selectedRows
-//  */
-// const handleRemove = async (selectedRows: TableListItem[]) => {
-//   const hide = message.loading('正在删除');
-//   if (!selectedRows) return true;
-//   try {
-//     await removeRule({
-//       id: selectedRows.map((row) => row.id),
-//     });
-//     hide();
-//     message.success('删除成功，即将刷新');
-//     return true;
-//   } catch (error) {
-//     hide();
-//     message.error('删除失败，请重试');
-//     return false;
-//   }
-// };
 
 
 function toObject(arr: any) {
@@ -92,11 +22,8 @@ function toObject(arr: any) {
 
 const TableList: React.FC<{}> = () => {
   const [sorter, setSorter] = useState<string>('');
-  const [createModalVisible, handleModalVisible] = useState<boolean>(false);
-  const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [allBrands, SetallBrands] = useState<{ [key: string]: string }>({});
-  const [stepFormValues, setStepFormValues] = useState({});
   const actionRef = useRef<ActionType>();
 
 
@@ -110,11 +37,11 @@ const TableList: React.FC<{}> = () => {
 
   const onChangeProductStatus = (id: number, status: boolean) => {
     setLoading(true);
-    updateProductStatus(id, status).then((data: any) => {
-      if (data.success) {
-        setLoading(false);
-      }
-    })
+    // updateProductStatus(id, status).then((data: any) => {
+    //   if (data.success) {
+    //     setLoading(false);
+    //   }
+    // })
   }
   const columns: ProColumns<TableListItem>[] = [
     {
@@ -182,10 +109,10 @@ const TableList: React.FC<{}> = () => {
       render: (_, record) => (
         <>
           <a
-            onClick={() => {
-              handleUpdateModalVisible(true);
-              setStepFormValues(record);
-            }}
+            // onClick={() => {
+            //   handleUpdateModalVisible(true);
+            //   setStepFormValues(record);
+            // }}
           >
             configure
           </a>
@@ -215,7 +142,7 @@ const TableList: React.FC<{}> = () => {
             sorter,
           }}
           toolBarRender={(action, { selectedRows }) => [
-            <Button type="primary" onClick={() => handleModalVisible(true)}>
+            <Button type="primary" onClick={() => history.push('/products/Create')}>
               <PlusOutlined /> New
           </Button>,
             selectedRows && selectedRows.length > 0 && (
@@ -248,39 +175,6 @@ const TableList: React.FC<{}> = () => {
           pagination={{ showTotal: (total) => `Total ${total} items` }}
         />
       </IntlProvider>
-
-      <CreateForm
-        onClose={() => {
-          handleModalVisible(false);
-        }}
-        Open={createModalVisible}
-      />
-
-
-
-
-      {
-        stepFormValues && Object.keys(stepFormValues).length ? (
-          <UpdateForm
-            onSubmit={async (value) => {
-              const success = await handleUpdate(value);
-              if (success) {
-                handleUpdateModalVisible(false);
-                setStepFormValues({});
-                if (actionRef.current) {
-                  actionRef.current.reload();
-                }
-              }
-            }}
-            onCancel={() => {
-              handleUpdateModalVisible(false);
-              setStepFormValues({});
-            }}
-            updateModalVisible={updateModalVisible}
-            values={stepFormValues}
-          />
-        ) : null
-      }
     </PageHeaderWrapper >
   );
 };
