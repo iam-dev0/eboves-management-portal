@@ -51,4 +51,5 @@ export default {
   'menu.editor.koni': '拓扑编辑器',
   'menu.Products': 'Products',
   'menu.Products.Products': 'Products',
+  'menu.Products.Brands': 'brands',
 };

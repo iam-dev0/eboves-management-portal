@@ -30,6 +30,14 @@ export async function postProduct(data:any){
 }
 
 
+export async function postVariation(data:any){
+  const option={
+    method:'POST',
+    data:data.variations
+  }
+  return request(`http://localhost:4040/products/${data.id}/variations`,option);
+}
+
 export async function getProduct(id:number){
   return request(`http://localhost:4040/products/${id}`);
 }

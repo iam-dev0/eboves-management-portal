@@ -7,6 +7,7 @@ import {
   getAllAttributes,
   getProduct,
   getSubCategories,
+  postVariation,
 } from './service';
 
 export interface StateType {}
@@ -15,6 +16,7 @@ export interface ModelType {
   state?: StateType;
   effects: {
     create: Effect;
+    createOrUpdateVariation:Effect;
     fetchBrands: Effect;
     fetchSuppliers: Effect;
     fetchAttributes: Effect;
@@ -43,6 +45,10 @@ const BrandsModal: ModelType = {
   effects: {
     *create({ payload ,callback}, { call }) {
       const response = yield call(postProduct, payload);
+      if(callback)callback(response.data);
+    },
+    *createOrUpdateVariation({ payload ,callback}, { call }) {
+      const response = yield call(postVariation, payload);
       if(callback)callback(response.data);
     },
     *fetchProduct({payload}, { call, put }) {

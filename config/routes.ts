@@ -64,6 +64,7 @@ export default [
                   name: 'Create Product',
                   icon: 'smile',
                   component: './Products/Create',
+                  hideInMenu :true,
                   // authority: ['admin'],
                 },
                 {
@@ -71,6 +72,7 @@ export default [
                   name: 'Create Variation',
                   icon: 'smile',
                   component: './Products/Create/variation',
+                  hideInMenu :true,
                   // authority: ['admin'],
                 },
                 {

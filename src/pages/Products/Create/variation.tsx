@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Card, Input, Row, Col, Divider, Descriptions, Spin, Tooltip } from 'antd';
-import { MinusCircleOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { connect } from 'umi';
 import { getARandomNumber, capitalizeFirstLetter } from '@/utils/utils';
 import { PageHeaderWrapper, RouteContext } from '@ant-design/pro-layout';
 import { FormInstance } from 'antd/lib/form';
+import dayjs from 'dayjs';
 import styles from './style.less';
 
 const FormItem = Form.Item;
@@ -20,6 +21,17 @@ export interface FormVarationsValueType {
   costPrice?: number;
   barcodes?: Array<BarcodeType>;
 }
+
+const customStructuring = (attributes: any) => {
+  const keys = Object.keys(attributes);
+  const newattributeStruction = attributes
+    .map((item: any, index: number) => ({
+      id: keys[index],
+      ...item,
+    }))
+    .filter(({ value }: any) => value);
+  return newattributeStruction;
+};
 
 const CreateVariationForm: React.FC<any> = (props) => {
   const [variationForms, setVariationForms] = useState<any[]>([
@@ -60,22 +72,41 @@ const CreateVariationForm: React.FC<any> = (props) => {
     );
   };
 
-  const onSubmit = () => {
-    variationForms.map(async ({form:{current}}) => {
-      current.validateFields().then((values:any) => {
-        // Do something with 
-        console.log(values);
-      });
-    });
+  const onSubmit = async () => {
+    const variations: any = [];
+    await variationForms
+      .map(async ({ id, form: { current } }) => {
+        const values: any = await current.validateFields().catch((error: any) => {
+          current.scrollToField(error.errorFields[0].name, {
+            behavior: 'smooth',
+            block: 'center',
+            scrollMode: 'if-needed',
+          });
+          throw Error(error);
+        });
+        if (!values) return;
+        const vlus = values[id];
+        vlus.attribute = customStructuring(vlus.attributes);
+        variations.push(vlus);
+      })
+      .reduce((m, o) => m.then(() => o), Promise.resolve())
+      .then(() => {
+        console.log(variations);
+        dispatch({
+          type: 'productCreate/createOrUpdateVariation',
+          payload: { id: product.id, variations },
+        });
+      })
+      .catch((error) => console.log(error));
   };
-  const attributeField = (attribute: any) => {
+  const attributeField = (attribute: any, index: number) => {
     return (
       <>
         <Col lg={18} md={18} sm={18}>
           <Form.Item
             label={capitalizeFirstLetter(attribute.name)}
-            name={[attribute.name, 'value']}
-            // fieldKey={[attribute.id, 'price']}
+            name={[attribute.id, 'value']}
+            // fieldKey={[attribute.id, 'attribute']}
             rules={[{ required: true, message: 'Missing Price' }]}
           >
             <Input placeholder="Price" />
@@ -83,8 +114,8 @@ const CreateVariationForm: React.FC<any> = (props) => {
         </Col>
         <Col lg={6} md={6} sm={6}>
           <Form.Item
-            label="Alt"
-            name={[attribute.name, 'alt']}
+            label="alt"
+            name={[attribute.id, 'alt']}
             // fieldKey={[attribute.id, 'attribute']}
             rules={[{ required: true, message: 'Missing' }]}
           >
@@ -114,9 +145,11 @@ const CreateVariationForm: React.FC<any> = (props) => {
       {({ isMobile }) => (
         <Descriptions size="small" column={isMobile ? 1 : 2}>
           <Descriptions.Item label="Name">{product?.name}</Descriptions.Item>
-          <Descriptions.Item label="Brand">{product?.name}</Descriptions.Item>
-          <Descriptions.Item label="Product Typoe">{product?.name}</Descriptions.Item>
-          <Descriptions.Item label="Created At">{product?.createdAt}</Descriptions.Item>
+          <Descriptions.Item label="Brand">{product?.brand?.name}</Descriptions.Item>
+          <Descriptions.Item label="Product Typoe">{product?.productType}</Descriptions.Item>
+          <Descriptions.Item label="Created At">
+            {dayjs(product?.createdAt).format('DD-MM-YYYY hh:mm')}
+          </Descriptions.Item>
           {/* <Descriptions.Item label="date">2017-07-07 ~ 2017-08-08</Descriptions.Item>
             <Descriptions.Item label="des">somethig</Descriptions.Item> */}
         </Descriptions>
@@ -124,109 +157,113 @@ const CreateVariationForm: React.FC<any> = (props) => {
     </RouteContext.Consumer>
   );
 
-  const variationForm = (elemnt: any, index: number) => (
-    <Card
-      title={`${index + 1}) Variation Information`}
-      className={styles.card}
-      bordered={false}
-      key={elemnt.id}
-      extra={cardHeaderButtons(elemnt.id)}
-    >
-      <Form layout="vertical">
-        <Row gutter={16}>
-          <Col lg={12} md={12} sm={12}>
-            <FormItem name="sku" label="SKU">
-              <Input placeholder="Enter." />
-            </FormItem>
-          </Col>
-          <Col lg={12} md={12} sm={12}>
-            <FormItem name="slug" label="Slug">
-              <Input placeholder="Enter." />
-            </FormItem>
-          </Col>
-          <Col lg={12} md={12} sm={12}>
-            <FormItem name="price" label="Retail Price">
-              <Input placeholder="Enter." />
-            </FormItem>
-          </Col>
-          {product?.attributes && product?.attributes?.length > 1 && (
+  const variationForm = (elemnt: any, index: number) => {
+    const { id }: { id: number } = elemnt;
+    return (
+      <Card
+        title={`${index + 1}) Variation Information`}
+        className={styles.card}
+        bordered={false}
+        key={id}
+        extra={cardHeaderButtons(id)}
+      >
+        <Form layout="vertical" ref={elemnt.form}>
+          <Row gutter={16}>
+            <Col lg={8} md={12} sm={12}>
+              <FormItem name={[id, 'sku']} label="SKU">
+                <Input placeholder="Enter." />
+              </FormItem>
+            </Col>
+            <Col lg={8} md={12} sm={12}>
+              <FormItem name={[id, 'slug']} label="Slug">
+                <Input placeholder="Enter." />
+              </FormItem>
+            </Col>
+            <Col lg={8} md={12} sm={12}>
+              <FormItem name={[id, 'price']} label="Retail Price">
+                <Input placeholder="Enter." />
+              </FormItem>
+            </Col>
+            {product?.attributes && product?.attributes?.length > 1 && (
+              <Col lg={24} md={24} sm={24}>
+                <Divider orientation="left">Attributes</Divider>
+                <Form.List name={[id, 'attributes']}>
+                  {() => {
+                    return (
+                      <div>
+                        <Row gutter={12}>
+                          {product?.attributes.map((attribute: any, index: number) => (
+                            <>{attributeField(attribute, index)}</>
+                          ))}
+                        </Row>
+                      </div>
+                    );
+                  }}
+                </Form.List>
+              </Col>
+            )}
             <Col lg={24} md={24} sm={24}>
-              <Divider orientation="left">Attributes</Divider>
-              <Form.List name="attributes">
-                {() => {
+              <Divider orientation="left">Barcodes</Divider>
+              <Form.List name={[id, 'barcodes']}>
+                {(fields, { add, remove }) => {
                   return (
                     <div>
-                      <Row gutter={12}>
-                        {product?.attributes.map((attribute: any) => (
-                          <>{attributeField(attribute)}</>
-                        ))}
-                      </Row>
+                      {fields.map((field) => (
+                        <Row key={field.key} gutter={12}>
+                          <Col lg={11} md={10} sm={10}>
+                            <Form.Item
+                              {...field}
+                              label="Barcode"
+                              name={[field.name, 'barcode']}
+                              fieldKey={[field.fieldKey, 'barcode']}
+                              rules={[{ required: true, message: 'Missing barcode' }]}
+                            >
+                              <Input placeholder="barcode" />
+                            </Form.Item>
+                          </Col>
+                          <Col lg={11} md={10} sm={10}>
+                            <Form.Item
+                              {...field}
+                              label="Supplier Price"
+                              name={[field.name, 'supplierPrice']}
+                              fieldKey={[field.fieldKey, 'price']}
+                              rules={[{ required: true, message: 'Missing Price' }]}
+                            >
+                              <Input placeholder="Price" />
+                            </Form.Item>
+                          </Col>
+                          <Col lg={2} md={2} sm={2}>
+                            <MinusCircleOutlined
+                              style={{ marginTop: '40px' }}
+                              onClick={() => {
+                                remove(field.name);
+                              }}
+                            />
+                          </Col>
+                        </Row>
+                      ))}
+
+                      <Form.Item>
+                        <Button
+                          type="dashed"
+                          onClick={() => {
+                            add();
+                          }}
+                          block
+                        >
+                          <PlusOutlined /> Add field
+                        </Button>
+                      </Form.Item>
                     </div>
                   );
                 }}
               </Form.List>
             </Col>
-          )}
-          <Col lg={24} md={24} sm={24}>
-            <Divider orientation="left">Barcodes</Divider>
-            <Form.List name="barcodes">
-              {(fields, { add, remove }) => {
-                return (
-                  <div>
-                    {fields.map((field) => (
-                      <Row key={field.key} gutter={12}>
-                        <Col lg={11} md={10} sm={10}>
-                          <Form.Item
-                            {...field}
-                            label="Barcode"
-                            name={[field.name, 'barcode']}
-                            fieldKey={[field.fieldKey, 'barcode']}
-                            rules={[{ required: true, message: 'Missing barcode' }]}
-                          >
-                            <Input placeholder="barcode" />
-                          </Form.Item>
-                        </Col>
-                        <Col lg={11} md={10} sm={10}>
-                          <Form.Item
-                            {...field}
-                            label="Supplier Price"
-                            name={[field.name, 'Supplier Price']}
-                            fieldKey={[field.fieldKey, 'price']}
-                            rules={[{ required: true, message: 'Missing Price' }]}
-                          >
-                            <Input placeholder="Price" />
-                          </Form.Item>
-                        </Col>
-                        <Col lg={2} md={2} sm={2}>
-                          <MinusCircleOutlined
-                            onClick={() => {
-                              remove(field.name);
-                            }}
-                          />
-                        </Col>
-                      </Row>
-                    ))}
-
-                    <Form.Item>
-                      <Button
-                        type="dashed"
-                        onClick={() => {
-                          add();
-                        }}
-                        block
-                      >
-                        <PlusOutlined /> Add field
-                      </Button>
-                    </Form.Item>
-                  </div>
-                );
-              }}
-            </Form.List>
-          </Col>
-        </Row>
-      </Form>
-    </Card>
-  );
+          </Row>
+        </Form>
+      </Card>
+    );
+  };
 
   const extra = (
     <div style={{ marginTop: '35px' }}>

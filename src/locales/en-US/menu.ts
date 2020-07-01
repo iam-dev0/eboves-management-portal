@@ -51,4 +51,6 @@ export default {
   'menu.editor.koni': 'Koni Editor',
   'menu.Products': 'Products',
   'menu.Products.Products': 'Products',
+  'menu.Products.Brands': 'brands',
+   
 };
