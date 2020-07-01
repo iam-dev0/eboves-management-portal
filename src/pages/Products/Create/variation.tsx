@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Card, Input, Row, Col, Divider, Descriptions, Spin } from 'antd';
+import { Form, Button, Card, Input, Row, Col, Divider, Descriptions, Spin, Tooltip } from 'antd';
 import { MinusCircleOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { connect } from 'umi';
+import { getARandomNumber, capitalizeFirstLetter } from '@/utils/utils';
 import { PageHeaderWrapper, RouteContext } from '@ant-design/pro-layout';
 import { FormInstance } from 'antd/lib/form';
 import styles from './style.less';
@@ -21,40 +22,60 @@ export interface FormVarationsValueType {
 }
 
 const CreateVariationForm: React.FC<any> = (props) => {
-  const [variationForms, setVariationForms] = useState<any[]>([React.createRef<FormInstance>()]);
-  const { loading, dispatch, match,productCreate:{product} } = props;
+  const [variationForms, setVariationForms] = useState<any[]>([
+    { id: getARandomNumber(), form: React.createRef<FormInstance>() },
+  ]);
+
+  const {
+    loading,
+    dispatch,
+    match,
+    productCreate: { product },
+  } = props;
 
   useEffect(() => {
     dispatch({ type: 'productCreate/fetchProduct', payload: match.params.id });
   }, []);
+
   const addVarition = () => {
-    setVariationForms((state) => [...state, React.createRef<FormInstance>()]);
+    setVariationForms((state) => [
+      ...state,
+      { id: getARandomNumber(), form: React.createRef<FormInstance>() },
+    ]);
   };
-  const RemoveVariation = (index: number) => {
-    setVariationForms((state) => state.filter((ref, i) => index !== i));
+
+  const RemoveVariation = (id: number) => {
+    setVariationForms((state) => state.filter((elmt) => id !== elmt.id));
   };
+
   const cardHeaderButtons = (index: number) => {
     return (
       <>
         {variationForms.length > 1 && (
-          <Button onClick={() => RemoveVariation(index)} icon={<DeleteOutlined />} type="ghost" />
+          <span onClick={() => RemoveVariation(index)} className={styles.removeButton}>
+            x
+          </span>
         )}
       </>
     );
   };
 
+  const onSubmit = () => {
+    variationForms.map(async ({form:{current}}) => {
+      current.validateFields().then((values:any) => {
+        // Do something with 
+        console.log(values);
+      });
+    });
+  };
   const attributeField = (attribute: any) => {
-    console.log(attribute);
     return (
       <>
-        <Divider orientation="left" plain>
-          {attribute.label[0]}
-        </Divider>
         <Col lg={18} md={18} sm={18}>
           <Form.Item
-            label="Value"
-            name={[attribute.key, 'attributeValue']}
-            fieldKey={[attribute.key, 'price']}
+            label={capitalizeFirstLetter(attribute.name)}
+            name={[attribute.name, 'value']}
+            // fieldKey={[attribute.id, 'price']}
             rules={[{ required: true, message: 'Missing Price' }]}
           >
             <Input placeholder="Price" />
@@ -63,8 +84,8 @@ const CreateVariationForm: React.FC<any> = (props) => {
         <Col lg={6} md={6} sm={6}>
           <Form.Item
             label="Alt"
-            name={[attribute.key, 'Alter']}
-            fieldKey={[attribute.key, 'attribute']}
+            name={[attribute.name, 'alt']}
+            // fieldKey={[attribute.id, 'attribute']}
             rules={[{ required: true, message: 'Missing' }]}
           >
             <Input placeholder="enter alter value" />
@@ -87,15 +108,15 @@ const CreateVariationForm: React.FC<any> = (props) => {
       )}
     </RouteContext.Consumer>
   );
-  
+
   const description = (
     <RouteContext.Consumer>
       {({ isMobile }) => (
         <Descriptions size="small" column={isMobile ? 1 : 2}>
-          <Descriptions.Item label="Name">Name of the product</Descriptions.Item>
-          <Descriptions.Item label="Brand">Brand</Descriptions.Item>
-          <Descriptions.Item label="Product Typoe">Eboves</Descriptions.Item>
-          <Descriptions.Item label="Created At">2017-07-07</Descriptions.Item>
+          <Descriptions.Item label="Name">{product?.name}</Descriptions.Item>
+          <Descriptions.Item label="Brand">{product?.name}</Descriptions.Item>
+          <Descriptions.Item label="Product Typoe">{product?.name}</Descriptions.Item>
+          <Descriptions.Item label="Created At">{product?.createdAt}</Descriptions.Item>
           {/* <Descriptions.Item label="date">2017-07-07 ~ 2017-08-08</Descriptions.Item>
             <Descriptions.Item label="des">somethig</Descriptions.Item> */}
         </Descriptions>
@@ -103,14 +124,15 @@ const CreateVariationForm: React.FC<any> = (props) => {
     </RouteContext.Consumer>
   );
 
-  const variationForm = (ref: any, index: number) => (
+  const variationForm = (elemnt: any, index: number) => (
     <Card
       title={`${index + 1}) Variation Information`}
       className={styles.card}
       bordered={false}
-      extra={cardHeaderButtons(index)}
+      key={elemnt.id}
+      extra={cardHeaderButtons(elemnt.id)}
     >
-      <Form layout="vertical" ref={ref}>
+      <Form layout="vertical">
         <Row gutter={16}>
           <Col lg={12} md={12} sm={12}>
             <FormItem name="sku" label="SKU">
@@ -127,27 +149,27 @@ const CreateVariationForm: React.FC<any> = (props) => {
               <Input placeholder="Enter." />
             </FormItem>
           </Col>
-          {/* {attributes && attributes.length > 1 && (
-              <Col lg={24} md={24} sm={24}>
-                <Divider orientation="left">Attributes</Divider>
-                <Form.List name="attributes">
-                  {() => {
-                    return (
-                      <div>
-                        <Row gutter={12}>
-                          {attributes.map((attribute) => (
-                            <>{attributeField(attribute)}</>
-                          ))}
-                        </Row>
-                      </div>
-                    );
-                  }}
-                </Form.List>
-              </Col>
-            )} */}
+          {product?.attributes && product?.attributes?.length > 1 && (
+            <Col lg={24} md={24} sm={24}>
+              <Divider orientation="left">Attributes</Divider>
+              <Form.List name="attributes">
+                {() => {
+                  return (
+                    <div>
+                      <Row gutter={12}>
+                        {product?.attributes.map((attribute: any) => (
+                          <>{attributeField(attribute)}</>
+                        ))}
+                      </Row>
+                    </div>
+                  );
+                }}
+              </Form.List>
+            </Col>
+          )}
           <Col lg={24} md={24} sm={24}>
             <Divider orientation="left">Barcodes</Divider>
-            <Form.List name="barcodes" style={{}}>
+            <Form.List name="barcodes">
               {(fields, { add, remove }) => {
                 return (
                   <div>
@@ -208,7 +230,9 @@ const CreateVariationForm: React.FC<any> = (props) => {
 
   const extra = (
     <div style={{ marginTop: '35px' }}>
-      <Button type="primary">Submit</Button>
+      <Button type="primary" onClick={onSubmit}>
+        Submit
+      </Button>
     </div>
   );
   return (
@@ -220,15 +244,18 @@ const CreateVariationForm: React.FC<any> = (props) => {
     >
       <Spin spinning={loading}>
         <div className={styles.addfloadbutton}>
-          <Button
-            shape="circle"
-            type="primary"
-            icon={<PlusOutlined />}
-            size="large"
-            onClick={addVarition}
-          />
+          <Tooltip title="add new variation">
+            <Button
+              shape="circle"
+              type="primary"
+              icon={<PlusOutlined />}
+              size="large"
+              onClick={addVarition}
+            />
+          </Tooltip>
         </div>
-        {variationForms.map((fromRef, index) => variationForm(fromRef, index))}
+
+        {variationForms.map((elemnt, index) => variationForm(elemnt, index))}
       </Spin>
     </PageHeaderWrapper>
   );
@@ -246,4 +273,3 @@ export default connect(
     loading: loading.models.productCreate,
   }),
 )(CreateVariationForm);
-

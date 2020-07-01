@@ -63,3 +63,15 @@ export const getRouteAuthority = (path: string, routeData: Route[]) => {
   });
   return authorities;
 };
+
+
+
+export  const capitalizeFirstLetter=(string:string)=> {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+
+export  const getARandomNumber=()=> {
+  return Math.floor(Math.random() * 1000000);
+}
+

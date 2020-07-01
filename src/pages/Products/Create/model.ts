@@ -34,7 +34,7 @@ export interface ModelType {
 const BrandsModal: ModelType = {
   namespace: 'productCreate',
   state: {
-    product:{},
+    product:undefined,
     brands: [],
     suppliers: [],
     attributes: [],
@@ -49,7 +49,7 @@ const BrandsModal: ModelType = {
       const response = yield call(getProduct,payload);
       yield put({
         type: 'productInfo',
-        payload: typeof response === "object" ? response : {},
+        payload: typeof response === "object" ? response.data :undefined,
       });
     },
     *fetchBrands(_, { call, put }) {
