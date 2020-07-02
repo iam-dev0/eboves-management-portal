@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Button, Input, Select, Row, Upload, Col, Tag, Card,Spin } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { connect, Dispatch,history } from 'umi';
-import { PageHeaderWrapper, GridContent } from '@ant-design/pro-layout';
+import { PageHeaderWrapper, GridContent,getPageTitle, MenuDataItem } from '@ant-design/pro-layout';
 
 
 export interface FormValueType {
@@ -20,6 +20,7 @@ interface CreateFormProps {
   dispatch: Dispatch;
   loading: boolean;
   productCreate: any;
+  route:MenuDataItem;
 }
 
 const FormItem = Form.Item;
@@ -86,7 +87,9 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
     });
   };
   return (
-    <PageHeaderWrapper>
+    <PageHeaderWrapper title={getPageTitle({
+      title:props.route.name,
+    })}>
       <GridContent>
         <Spin spinning={loading}>
           <Card bordered={false}>

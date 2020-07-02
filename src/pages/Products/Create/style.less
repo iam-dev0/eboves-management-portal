@@ -1,76 +1,84 @@
-
-.addfloadbutton{
+.addfloadbutton {
   position: fixed;
   bottom: 80px;
   right: 20px;
   z-index: 1;
-  &:hover{
+  -webkit-box-shadow: 0 3px 6px -4px rgba(0, 0, 0, .12), 0 6px 16px 0 rgba(0, 0, 0, .08), 0 9px 28px 8px rgba(0, 0, 0, .05);
+  box-shadow: 0 3px 6px -4px rgba(0, 0, 0, .12), 0 6px 16px 0 rgba(0, 0, 0, .08), 0 9px 28px 8px rgba(0, 0, 0, .05);
+
+  &:hover {
     transform: scale(1.3);
   }
 }
-.removeButton{
+
+.removeButton {
   font-size: 20px;
 }
+
 .card {
-    margin-bottom: 24px;
-  
-    :global {
-      .ant-legacy-form-item .ant-legacy-form-item-control-wrapper {
-        width: 100%;
-      }
+  margin-bottom: 24px;
+
+  :global {
+    .ant-legacy-form-item .ant-legacy-form-item-control-wrapper {
+      width: 100%;
     }
   }
-  
-  .errorIcon {
-    margin-right: 24px;
-    // color: @error-color;
-    cursor: pointer;
-  
-    span.anticon {
-      margin-right: 4px;
+}
+
+.errorIcon {
+  margin-right: 24px;
+  // color: @error-color;
+  cursor: pointer;
+
+  span.anticon {
+    margin-right: 4px;
+  }
+}
+
+.errorPopover {
+  :global {
+    .ant-popover-inner-content {
+      min-width: 256px;
+      max-height: 290px;
+      padding: 0;
+      overflow: auto;
     }
   }
-  
-  .errorPopover {
-    :global {
-      .ant-popover-inner-content {
-        min-width: 256px;
-        max-height: 290px;
-        padding: 0;
-        overflow: auto;
-      }
-    }
-  }
-  
-  .errorListItem {
-    padding: 8px 16px;
-    list-style: none;
-    // border-bottom: 1px solid @border-color-split;
-    cursor: pointer;
-    transition: all 0.3s;
-    &:hover {
+}
+
+.errorListItem {
+  padding: 8px 16px;
+  list-style: none;
+  // border-bottom: 1px solid @border-color-split;
+  cursor: pointer;
+  transition: all 0.3s;
+
+  &:hover {
     //   background: @item-active-bg;
-    }
-    &:last-child {
-      border: 0;
-    }
-    .errorIcon {
-      float: left;
-      margin-top: 4px;
-      margin-right: 12px;
-      padding-bottom: 22px;
+  }
+
+  &:last-child {
+    border: 0;
+  }
+
+  .errorIcon {
+    float: left;
+    margin-top: 4px;
+    margin-right: 12px;
+    padding-bottom: 22px;
     //   color: @error-color;
-    }
-    .errorField {
-      margin-top: 2px;
+  }
+
+  .errorField {
+    margin-top: 2px;
     //   color: @text-color-secondary;
-      font-size: 12px;
-    }
+    font-size: 12px;
   }
-  
-  .editable {
-    td {
-      padding-top: 13px !important;
-      padding-bottom: 12.5px !important;
-    }
+}
+
+.editable {
+  td {
+    padding-top: 13px !important;
+    padding-bottom: 12.5px !important;
   }
+}
