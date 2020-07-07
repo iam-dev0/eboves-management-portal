@@ -1,4 +1,10 @@
-import { DownOutlined, PlusOutlined, MinusOutlined, EditFilled, DeleteOutlined } from '@ant-design/icons';
+import {
+  DownOutlined,
+  PlusOutlined,
+  MinusOutlined,
+  EditFilled,
+  DeleteOutlined,
+} from '@ant-design/icons';
 import { Button, Switch, Dropdown, Menu, Input } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
 import { connect, history } from 'umi';
@@ -7,7 +13,7 @@ import ProTable, { ProColumns, ActionType, IntlProvider, enUSIntl } from '@ant-d
 import { SorterResult } from 'antd/es/table/interface';
 import { TableListItem } from './data';
 import { fetchProducts } from './service';
-
+import style from './index.less';
 import NestedTable from './components/VariationList';
 
 function toObject(arr: any): { [key: string]: string | number | boolean | {} | null } {
@@ -22,17 +28,18 @@ const menu = (
   <Menu>
     <Menu.Item icon={<EditFilled />}>Edit</Menu.Item>
     <Menu.Item icon={<DeleteOutlined />}>Delete</Menu.Item>
-    <Menu.Item icon={<PlusOutlined />} >Add New Variation</Menu.Item>
+    <Menu.Item icon={<PlusOutlined />}>Add New Variation</Menu.Item>
   </Menu>
 );
 
 const TableList: React.FC<any> = (props) => {
   const [sorter, setSorter] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
+
   const [expandedRowKeys, setExpandedRowKeys] = useState<number[]>([]);
   const actionRef = useRef<ActionType>();
 
   const {
+    loading,
     dispatch,
     products: { brands, suppliers },
   } = props;
@@ -43,12 +50,7 @@ const TableList: React.FC<any> = (props) => {
   }, []);
 
   const onChangeProductStatus = (id: number, status: boolean) => {
-    setLoading(true);
-    updateProductStatus(id, status).then((data: any) => {
-      if (data.success) {
-        setLoading(false);
-      }
-    });
+    dispatch({ type: 'products/updateProductActiveStatus', payload: { id, active: status } });
   };
   const columns: ProColumns<TableListItem>[] = [
     {
@@ -107,7 +109,7 @@ const TableList: React.FC<any> = (props) => {
       },
 
       renderText: (text, record) => {
-        const active=text === 'Active';
+        const active = text === 'Active';
         return (
           <Switch
             defaultChecked={active}
@@ -153,19 +155,25 @@ const TableList: React.FC<any> = (props) => {
     expandedRowKeys,
     onExpand: (expanded: boolean, record: any) => {
       setExpandedRowKeys(expanded ? [record.id] : []);
+      if (expanded)
+        dispatch({ type: 'products/fetchProductVariations', payload: { id: record.id } });
     },
-    expandIcon: ({ expanded, onExpand, record }: any) =>
-      expanded ? (
-        <MinusOutlined onClick={(e) => onExpand(record, e)} />
-      ) : (
-        <PlusOutlined onClick={(e) => onExpand(record, e)} />
-      ),
+    expandIcon: ({ expanded, onExpand, record }: any) => {
+      if (record.variations.length > 0)
+        return expanded ? (
+          <MinusOutlined onClick={(e) => onExpand(record, e)} />
+        ) : (
+          <PlusOutlined onClick={(e) => onExpand(record, e)} />
+        );
+
+      return null;
+    },
     expandedRowRender: (record) => (
-      <div>
-        <NestedTable />
+      <div className={style.nestedRows}>
+        <NestedTable product={record} />
       </div>
     ),
-    rowExpandable: (record) => true,
+    rowExpandable: (record) => record.variations.length > 0,
   };
 
   return (
@@ -227,13 +235,7 @@ const TableList: React.FC<any> = (props) => {
 };
 
 export default connect(
-  ({
-    products,
-    loading,
-  }: {
-    products: any;
-    loading: { models: { [key: string]: boolean } };
-  }) => ({
+  ({ products, loading }: { products: any; loading: { models: { [key: string]: boolean } } }) => ({
     products,
     loading: loading.models.products,
   }),
