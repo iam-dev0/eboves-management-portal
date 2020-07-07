@@ -19,7 +19,7 @@ export interface FormValueType {
 interface CreateFormProps {
   dispatch: Dispatch;
   loading: boolean;
-  productCreate: any;
+  products: any;
   route:MenuDataItem;
 }
 
@@ -44,20 +44,20 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
   const {
     loading,
     dispatch,
-    productCreate: { brands, categories, suppliers, attributes },
+    products: { brands, categories, suppliers, attributes },
   } = props;
 
   useEffect(() => {
-    dispatch({ type: 'productCreate/fetchBrands' });
-    dispatch({ type: 'productCreate/fetchSuppliers' });
-    dispatch({ type: 'productCreate/fetchAttributes' });
-    dispatch({ type: 'productCreate/fetchCategories' });
+    dispatch({ type: 'products/fetchBrands' });
+    dispatch({ type: 'products/fetchSuppliers' });
+    dispatch({ type: 'products/fetchAttributes' });
+    dispatch({ type: 'products/fetchCategories' });
   }, []);
 
   const onCategoryChangeHandler = (value: number) => {
     productForm.setFieldsValue({ subCategory: null, subSubCategory: null });
     dispatch({
-      type: 'productCreate/fetchSubcategores',
+      type: 'products/fetchSubcategores',
       payload: value,
       callback: (response: any) => SetSubcategories(response),
     });
@@ -65,7 +65,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
   const onSubCategoryChangeHandler = (value: number) => {
     productForm.setFieldsValue({ subSubCategory: null });
     dispatch({
-      type: 'productCreate/fetchSubcategores',
+      type: 'products/fetchSubcategores',
       payload: value,
       callback: (response: any) => SetSubSubcategories(response),
     });
@@ -81,7 +81,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
 
   const onFinish = (values: any) => {
     dispatch({
-      type: 'productCreate/create',
+      type: 'products/create',
       payload: values,
       callback:(res)=>{history.push(`/products/${res.id}/variation/Create`)}
     });
@@ -113,9 +113,9 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
                   <FormItem name="supplierId" label="Supplier">
                     <Select placeholder="please select">
                       {suppliers &&
-                        suppliers.map((supplier: { id: number; companyName: string }) => (
+                        suppliers.map((supplier: { id: number; name: string }) => (
                           <Option key={supplier.id} value={supplier.id}>
-                            {supplier.companyName}
+                            {supplier.name}
                           </Option>
                         ))}
                     </Select>
@@ -267,13 +267,13 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
 
 export default connect(
   ({
-    productCreate,
+    products,
     loading,
   }: {
-    productCreate: any;
+    products: any;
     loading: { models: { [key: string]: boolean } };
   }) => ({
-    productCreate,
-    loading: loading.models.productCreate,
+    products,
+    loading: loading.models.products,
   }),
 )(CreateForm);

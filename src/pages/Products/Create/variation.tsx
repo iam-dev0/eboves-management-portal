@@ -42,11 +42,11 @@ const CreateVariationForm: React.FC<any> = (props) => {
     loading,
     dispatch,
     match,
-    productCreate: { product },
+    products: { product },
   } = props;
 
   useEffect(() => {
-    dispatch({ type: 'productCreate/fetchProduct', payload: match.params.id });
+    dispatch({ type: 'products/fetchProduct', payload: match.params.id });
   }, []);
 
   const addVarition = () => {
@@ -93,7 +93,7 @@ const CreateVariationForm: React.FC<any> = (props) => {
       .then(() => {
         console.log(variations);
         dispatch({
-          type: 'productCreate/createOrUpdateVariation',
+          type: 'products/createOrUpdateVariation',
           payload: { id: product.id, variations },
         });
       })
@@ -300,13 +300,13 @@ const CreateVariationForm: React.FC<any> = (props) => {
 
 export default connect(
   ({
-    productCreate,
+    products,
     loading,
   }: {
-    productCreate: any;
+    products: any;
     loading: { models: { [key: string]: boolean } };
   }) => ({
-    productCreate,
-    loading: loading.models.productCreate,
+    products,
+    loading: loading.models.products,
   }),
 )(CreateVariationForm);

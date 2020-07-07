@@ -45,6 +45,18 @@ const ViewProduct: React.FC<{}> = () => {
             price
           </Descriptions.Item>
         </Descriptions>
+        <Descriptions size={size} bordered>
+          <Descriptions.Item label="Bracode">bracode</Descriptions.Item>
+          <Descriptions.Item label="Price" span={2}>
+            price
+          </Descriptions.Item>
+        </Descriptions>
+        <Descriptions size={size} bordered>
+          <Descriptions.Item label="Bracode">bracode</Descriptions.Item>
+          <Descriptions.Item label="Price" span={2}>
+            price
+          </Descriptions.Item>
+        </Descriptions>
 
         <Descriptions bordered size={size}>
           <Descriptions.Item label="Description" span={3}>

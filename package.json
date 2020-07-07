@@ -51,7 +51,7 @@
   "dependencies": {
     "@ant-design/icons": "^4.0.0",
     "@ant-design/pro-layout": "^5.0.8",
-    "@ant-design/pro-table": "2.2.7",
+    "@ant-design/pro-table": "^2.4.1",
     "antd": "4.2.2",
     "classnames": "^2.2.6",
     "dayjs": "^1.8.28",

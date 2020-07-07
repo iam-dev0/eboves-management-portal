@@ -76,7 +76,7 @@ export default [
                     component: './Products/View',
                   },
                   {
-                    path: 'products/:id/variation/Create',
+                    path: '/products/:id/variation/Create',
                     name: 'Create Variation',
                     icon: 'smile',
                     component: './Products/Create/variation',

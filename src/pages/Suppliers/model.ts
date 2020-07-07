@@ -34,7 +34,7 @@ export interface ModelType {
 }
 
 const BrandsModal: ModelType = {
-  namespace: 'productCreate',
+  namespace: 'supplier',
   state: {
     product:undefined,
     brands: [],
