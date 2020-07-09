@@ -51,5 +51,5 @@ export default {
   'menu.editor.koni': '拓撲編輯器',
   'menu.Products': 'Products',
   'menu.Products.Products': 'Products',
-  'menu.Products.Brands': 'brands',
+  'menu.Products.Brands': 'Brands',
 };

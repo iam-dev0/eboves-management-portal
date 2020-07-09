@@ -99,6 +99,7 @@ const TableList: React.FC<any> = (props) => {
       dataIndex: 'active',
       sorter: true,
       width: '10%',
+      // filterDropdownVisible:false,
       valueEnum: {
         true: {
           text: 'Active',
@@ -107,7 +108,10 @@ const TableList: React.FC<any> = (props) => {
           text: 'Inactive',
         },
       },
-
+      onFilter: (value:any, record:TableListItem) => {
+        const v = value.toLowerCase() === 'true';
+        return record.active === v;
+      },
       renderText: (text, record) => {
         const active = text === 'Active';
         return (

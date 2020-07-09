@@ -30,8 +30,7 @@ const NestedTable: React.FC<any> = (props) => {
     { title: 'Sku', dataIndex: 'sku', width: '15%' },
     {
       title: 'Active',
-      dataIndex: 'upgradeNum',
-      key: 'upgradeNum',
+      dataIndex: 'active',
       width: '10%',
       render: (text, record) => {
         return (
@@ -76,7 +75,7 @@ const NestedTable: React.FC<any> = (props) => {
   const expandable = {
     expandedRowKeys,
     onExpand: (expanded: boolean, record: any) => {
-      setExpandedRowKeys(expanded ? [record.key] : []);
+      setExpandedRowKeys(expanded ? [record.id] : []);
       if (expanded) dispatch({ type: 'products/fetchVariation', payload: record.id });
     },
     expandIcon: ({ expanded, onExpand, record }: any) =>
@@ -96,6 +95,7 @@ const NestedTable: React.FC<any> = (props) => {
     <Table
       className="NestedTable"
       showHeader={false}
+      rowKey='id'
       pagination={false}
       columns={columns}
       expandable={expandable}

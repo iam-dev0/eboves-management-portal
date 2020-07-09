@@ -1,5 +1,8 @@
 @import '~antd/es/style/themes/default.less';
 
+@SidebarColor: #1e6e59;
+
+
 html,
 body,
 #root {
@@ -29,17 +32,43 @@ ol {
   list-style: none;
 }
 
+.ant-layout-sider {
+  background: @SidebarColor  !important;
 
-.OuterTable{
-  .ant-table-expanded-row > .ant-table-cell{
+  .ant-pro-sider-menu-logo h1{
+    display: none !important;
+  }
+
+  .ant-menu,
+  .ant-pro-sider-menu-logo {
+    background: @SidebarColor  !important;
+  }
+
+}
+
+
+.tag-primary-color {
+  // background-color: rgb(135, 208, 104) !important;
+  background-color: @primary-color  !important;
+  color: white !important;
+}
+
+.customExpendableRow {
+  border-left: 4px solid @primary-color;
+}
+
+.OuterTable {
+  .ant-table-expanded-row>.ant-table-cell {
     padding: 0px !important;
   }
 }
-.NestedTable{
 
-  .ant-table{
-    margin:0px 0px 0px 0px !important;
-    .NestFirtColum{
+.NestedTable {
+
+  .ant-table {
+    margin: 0px 0px 0px 0px !important;
+
+    .NestFirtColum {
       padding-left: 25px !important;
     }
   }
@@ -50,12 +79,15 @@ ol {
   .ant-table {
     width: 100%;
     overflow-x: auto;
-    &-thead > tr,
-    &-tbody > tr {
-      > th,
-      > td {
+
+    &-thead>tr,
+    &-tbody>tr {
+
+      >th,
+      >td {
         white-space: pre;
-        > span {
+
+        >span {
           display: block;
         }
       }
@@ -64,8 +96,9 @@ ol {
 }
 
 // 兼容IE11
-@media screen and(-ms-high-contrast: active), (-ms-high-contrast: none) {
-  body .ant-design-pro > .ant-layout {
+@media screen and(-ms-high-contrast: active),
+(-ms-high-contrast: none) {
+  body .ant-design-pro>.ant-layout {
     min-height: 100vh;
   }
 }
