@@ -87,8 +87,27 @@ export default [
                 path: '/product-module/brands',
                 name: 'Brands',
                 icon: 'smile',
-                component: './ProductModule/Brands',
-                // authority: ['admin'],
+                hideChildren: true,
+                routes: [
+                  {
+                    path: '/product-module/brands',
+                    name: 'Brands',
+                    icon: 'smile',
+                    component: './ProductModule/Brands',
+                  },
+                  {
+                    path: '/product-module/brands/create',
+                    name: 'Create Brands',
+                    icon: 'smile',
+                    component: './ProductModule/Brands/Create',
+                  },
+                  {
+                    path: '/product-module/brands/update/:id',
+                    name: 'Update Brands',
+                    icon: 'smile',
+                    component: './ProductModule/Brands/Create',
+                  },
+                ],
               },
               {
                 path: '/product-module/outlets',

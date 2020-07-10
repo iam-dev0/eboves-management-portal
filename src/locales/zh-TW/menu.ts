@@ -52,4 +52,17 @@ export default {
   'menu.Products': 'Products',
   'menu.Products.Products': 'Products',
   'menu.Products.Brands': 'Brands',
+  'menu.Products.Outlets': 'Outlets',
+  'menu.Products.Attributes': 'Attributes', 
+  'menu.Products.Categories': 'Categories',
+  'menu.Procurement.Suppliers"': 'Suppliers', 
+  'menu.Procurement':'Precurement',
+  'menu.Products.Products.Product List':'Product List',
+  'menu.Products.Products.Create Product':'Create Product',
+  'menu.Products.Products.View Product':'View Product',
+  'menu.Products.Products.Create Variation':'Create Variation',
+  'menu.Products.Brands.Brands':'Brand',
+  'menu.Products.Brands.Create Brands':'Create Brand',
+  'menu.Products.Brands.Update Brands':'Update Brand',
+  'menu.Procurement.Suppliers.Suppliers List':'Suppliers List'
 };

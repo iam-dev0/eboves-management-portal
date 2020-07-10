@@ -1,24 +1,33 @@
 import {
   DownOutlined,
   PlusOutlined,
-  EditFilled,
-  DeleteOutlined,
   RightOutlined,
+  DeleteOutlined,
 } from '@ant-design/icons';
-import { Button, Switch, Dropdown, Menu, Input, Tag } from 'antd';
+import { Button, Switch,Input, Tag } from 'antd';
 import React, { useState, useRef } from 'react';
-import { connect, history } from 'umi';
+import { connect } from 'umi';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import ProTable, { ProColumns, ActionType, IntlProvider, enUSIntl } from '@ant-design/pro-table';
 import { SorterResult } from 'antd/es/table/interface';
 import { fetchOutlets } from './service';
 import { OutletItem } from './data';
 import style from './index.less';
+import CreateOrUpdate from './Create';
 
 const TableList: React.FC<any> = (props) => {
   const [sorter, setSorter] = useState<string>('');
   const actionRef = useRef<ActionType>();
   const [expandedRowKeys, setExpandedRowKeys] = useState<number[]>([]);
+  const [openDrawer, setOpenDrawer] = useState<boolean>(false);
+  const [editDrawer, setEditDrawer] = useState<{
+    isUpdate: boolean;
+    data: OutletItem | undefined;
+  }>({
+    isUpdate: false,
+    data: undefined,
+  });
+
 
   const {
     loading,
@@ -26,9 +35,33 @@ const TableList: React.FC<any> = (props) => {
     // outlets,
   } = props;
 
-  const onChangeProductStatus = (id: number, status: boolean) => {
-    dispatch({ type: 'products/updateOutletActiveStatus', payload: id });
+
+
+
+
+
+  const toggleActiveStatus = (id: number) => {
+    dispatch({ type: 'outlets/toggleActiveStatus', payload: id });
   };
+
+  const handleBulkDelete = (ids: any) => {
+    dispatch({
+      type: 'outlets/bulkDelete',
+      payload: ids,
+      callback: () => {
+        // eslint-disable-next-line no-unused-expressions
+        actionRef.current?.reload();
+        // eslint-disable-next-line no-unused-expressions
+        actionRef.current?.clearSelected();
+      },
+    });
+  };
+
+  const onEditClickHandler = (record: OutletItem) => {
+    setEditDrawer({ isUpdate: true, data: record });
+    setOpenDrawer(true);
+  };
+
   const columns: ProColumns<OutletItem>[] = [
     {
       title: 'Name',
@@ -63,7 +96,7 @@ const TableList: React.FC<any> = (props) => {
         return (
           <Switch
             defaultChecked={active}
-            onChange={(value) => onChangeProductStatus(record.id, value)}
+            onChange={() => toggleActiveStatus(record.id)}
           />
         );
       },
@@ -73,7 +106,7 @@ const TableList: React.FC<any> = (props) => {
       dataIndex: 'createdAt',
       sorter: true,
       valueType: 'dateTime',
-      hideInForm: true,
+      hideInSearch: true,
       renderFormItem: (item, { defaultRender, ...rest }, form) => {
         const status = form.getFieldValue('status');
         if (`${status}` === '0') {
@@ -89,10 +122,9 @@ const TableList: React.FC<any> = (props) => {
       title: 'Action',
       dataIndex: 'option',
       valueType: 'option',
-      render: () => (
-        <span className="table-operation">
-          <a>View</a> |&nbsp;
-          <a>Delete</a>
+      render: (_,record:OutletItem) => (
+        <span   onClick={() => onEditClickHandler(record)}  className="table-operation">
+          <a>Edit</a>
         </span>
       ),
     },
@@ -138,31 +170,18 @@ const TableList: React.FC<any> = (props) => {
           params={{
             sorter,
           }}
-          toolBarRender={(action, { selectedRows }) => [
-            <Button type="primary" onClick={() => history.push('/products/Create')}>
+          toolBarRender={(action, { selectedRowKeys }) => [
+            <Button type="primary" onClick={() => setOpenDrawer(true)}>
               <PlusOutlined /> New
             </Button>,
-            selectedRows && selectedRows.length > 0 && (
-              <Dropdown
-                overlay={
-                  <Menu
-                    onClick={async (e) => {
-                      if (e.key === 'remove') {
-                        await handleRemove(selectedRows);
-                        action.reload();
-                      }
-                    }}
-                    selectedKeys={[]}
-                  >
-                    <Menu.Item key="remove">remove</Menu.Item>
-                    <Menu.Item key="approval">approve</Menu.Item>
-                  </Menu>
-                }
+            selectedRowKeys && selectedRowKeys.length > 0 && (
+              <Button
+                icon={<DeleteOutlined />}
+                danger
+                onClick={() => handleBulkDelete(selectedRowKeys)}
               >
-                <Button>
-                  button <DownOutlined />
-                </Button>
-              </Dropdown>
+                Delete
+              </Button>
             ),
           ]}
           tableAlertRender={false}
@@ -173,6 +192,21 @@ const TableList: React.FC<any> = (props) => {
           expandable={expandable}
         />
       </IntlProvider>
+
+      <CreateOrUpdate
+        onClose={() => {
+          setEditDrawer({ isUpdate: false, data: undefined });
+          setOpenDrawer(false);
+          // eslint-disable-next-line no-unused-expressions
+          actionRef.current?.reload();
+       
+         
+        }}
+        Open={openDrawer}
+        isUpdate={editDrawer.isUpdate}
+        data={editDrawer.data}
+        setEditDrawer={setEditDrawer}
+      />
     </PageHeaderWrapper>
   );
 };

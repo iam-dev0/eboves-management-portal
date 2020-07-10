@@ -1,19 +1,34 @@
 import { Effect, Reducer } from 'umi';
-import { getAllBrands } from './service';
-// import { BasicListItemDataType } from './data.d';
+import {
+  toggleActiveStatus,
+  bulkDelete,
+  create,
+  updateOutlet,
+  fetchCountries,
+  fetch,
+  fetchUsers,
+} from './service';
 
 export interface StateType {
-  list: any[];
+  suppliers: any[];
+  brand:any;
 }
 
 export interface ModelType {
   namespace: string;
   state: StateType;
   effects: {
-    fetch: Effect;
+    fetch:Effect;
+    toggleActiveStatus: Effect;
+    bulkDelete: Effect;
+    create: Effect;
+    update: Effect;
+    fetchUsers: Effect;
+    fetchCountries: Effect;
   };
   reducers: {
-    queryList: Reducer<StateType>;
+    putCountries: Reducer<StateType>;
+    putBrand:Reducer<StateType>;
   };
 }
 
@@ -21,24 +36,66 @@ const BrandsModal: ModelType = {
   namespace: 'brands',
 
   state: {
-    list: [],
+    suppliers: [],
+    brand:undefined,
   },
 
   effects: {
-    *fetch({ payload }, { call, put }) {
-      const response = yield call(getAllBrands);
+    *toggleActiveStatus({ payload }, { call }) {
+      yield call(toggleActiveStatus, payload);
+    },
+    *bulkDelete({ payload, callback }, { call }) {
+      yield call(bulkDelete, payload);
+      if (callback) callback();
+    },
+    *create({ payload, callback }, { call }) {
+      const res = yield call(create, payload);
+      if (callback && res?.data?.id) callback();
+    },
+    *fetch({ payload }, { call,put }) {
+      const res = yield call(fetch, payload);
       yield put({
-        type: 'queryList',
-        payload: Array.isArray(response) ? response : [],
+        type: 'putBrand',
+        payload: res?.data? res.data : undefined,
+      });
+    },
+    *update({ payload, callback }, { call }) {
+      const res = yield call(updateOutlet, payload);
+      if (callback && res?.data) callback();
+    },
+    *fetchUsers({ payload, callback }, { call }) {
+      const res = yield call(fetchUsers, payload);
+      if (callback && res?.data) callback();
+    },
+    *fetchCountries({ payload }, { call, put }) {
+      const res = yield call(fetchCountries, payload);
+      yield put({
+        type: 'putCountries',
+        payload: Array.isArray(res?.data) ? res?.data : [],
       });
     },
   },
-
   reducers: {
-    queryList(state, action) {
+    putCountries(state, action) {
+      const structure = action.payload.map((country: any) => {
+        return {
+          value: country.id,
+          label: country.name,
+          ...country,
+          children: country.cities?.map((city: any) => {
+            return { value: city.id, label: city.name,...city };
+          }),
+        };
+      });
       return {
         ...state,
-        list: action.payload,
+        suppliers: structure,
+      };
+    },
+    putBrand(state, action) {
+      return {
+        ...state,
+        brand: action.payload,
       };
     },
   },

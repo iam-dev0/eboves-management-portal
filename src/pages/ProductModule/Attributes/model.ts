@@ -1,5 +1,5 @@
 import { Effect, Reducer } from 'umi';
-// import {  } from './service';
+import { toggleActiveStatus, bulkDelete,createAttribute,updateAttribute } from './service';
 // import { BasicListItemDataType } from './data.d';
 
 export interface StateType {
@@ -10,11 +10,12 @@ export interface ModelType {
   namespace: string;
   state: StateType;
   effects: {
-    fetchOutlets: Effect;
+    toggleActiveStatus: Effect;
+    bulkDelete: Effect;
+    create:Effect;
+    update:Effect;
   };
-  reducers: {
-    putOutlets: Reducer<StateType>;
-  };
+  reducers: {};
 }
 
 const BrandsModal: ModelType = {
@@ -25,23 +26,25 @@ const BrandsModal: ModelType = {
   },
 
   effects: {
-    *fetchOutlets({ payload }, { call, put }) {
-      const response = yield call();
-      yield put({
-        type: 'putOutlets',
-        payload: Array.isArray(response) ? response : [],
-      });
+    *toggleActiveStatus({ payload }, { call }) {
+      yield call(toggleActiveStatus, payload);
     },
+    *bulkDelete({ payload, callback }, { call }) {
+      yield call(bulkDelete, payload);
+      if (callback) callback();
+    },
+    *create({ payload, callback }, { call }) {
+      const res=yield call(createAttribute, payload);
+      if (callback && res?.data?.id) callback();
+    },
+    *update({ payload, callback }, { call }) {
+      const res=yield call(updateAttribute, payload);
+      if (callback && res?.data) callback();
+    },
+    
   },
 
-  reducers: {
-    putOutlets(state, action) {
-      return {
-        ...state,
-        list: action.payload,
-      };
-    },
-  },
+  reducers: {},
 };
 
 export default BrandsModal;
