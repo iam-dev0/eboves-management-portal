@@ -1,106 +1,122 @@
 import React, { useEffect } from 'react';
-import { Form, Button, Input, Select, Card, Spin, Divider } from 'antd';
-
+import { Form, Button, Input, Select, Card, Spin, Divider, Cascader } from 'antd';
 import { connect, Dispatch, history } from 'umi';
 import { PageHeaderWrapper, GridContent, getPageTitle, MenuDataItem } from '@ant-design/pro-layout';
 import UploadImages from '@/components/UploadImages';
 import EditableTagGroup from '@/components/AddTags';
+import { findPath } from '@/utils/utils';
 import { upload } from '../service';
-import ModelType from './model';
 
 interface CreateFormProps {
   dispatch: Dispatch;
   loading: boolean;
-  brands: ModelType;
-  suppliers: any;
+  categories: any;
+  location: any;
   route: MenuDataItem;
   match: any;
 }
 
 const { TextArea } = Input;
-const { Option } = Select;
 
 const formItemLayout = {
   labelCol: { span: 6 },
   wrapperCol: { span: 14 },
 };
 
+const filter = (inputValue: any, path: any): any => {
+  return path.some(
+    (option: any) => option.label.toLowerCase().indexOf(inputValue.toLowerCase()) > -1,
+  );
+};
 const CreateForm: React.FC<CreateFormProps> = (props) => {
   const {
     loading,
     dispatch,
-    brands: { brand },
-    suppliers: { suppliers },
+    categories: { categories, category },
   } = props;
+
   const { id } = props.match.params;
+
+  const categoryId = props.location?.state?.categoryId;
   const [form] = Form.useForm();
 
   useEffect(() => {
-    if (id)
-      dispatch({
-        type: 'brands/fetch',
-        payload: id,
-      });
     dispatch({
-      type: 'suppliers/fetchSuppliers',
-      payload: id,
+      type: 'categories/fetchCategories',
     });
 
+    if (id)
+      dispatch({
+        type: 'categories/fetchCategory',
+        payload: id,
+      });
     return () => {
       dispatch({
-        type: 'brands/resetStates',
+        type: 'categories/resetStates',
       });
       form.resetFields();
     };
   }, []);
 
   useEffect(() => {
-    if (brand) {
+    if (category) {
       const values = {
-        ...brand,
-        logo: !brand.logo || [{ uid: 1, url: brand.logo }],
-        storyCover: !brand.storyCover || [{ uid: 1, url: brand.storyCover }],
-        metaKeywords: brand.metaKeywords?.split(','),
+        ...category,
+        image: category.image ? [{ uid: 1, url: category.image }] : undefined,
+        storyCover: category.storyCover ? [{ uid: 1, url: category.storyCover }] : undefined,
+        metaKeywords: category.metaKeywords?.split(','),
       };
       form.setFieldsValue(values);
     }
-  }, [brand]);
+
+    if ((categoryId || category) && categories?.length > 0) {
+      // eslint-disable-next-line radix
+      const path = findPath(categories, {
+        id: category ? category.categoryId : categoryId,
+      })?.map((item: any) => item.id);
+      if (path) form.setFieldsValue({ categoryId: path });
+    }
+  }, [categories, category]);
 
   const onFinish = (values: any) => {
     if (!id) {
       dispatch({
-        type: 'brands/create',
+        type: 'categories/create',
         payload: {
           ...values,
+          categoryId:
+            values.categoryId?.length > 0 ? values.categoryId[values.categoryId.length - 1] : null,
           storyCover: values.storyCover
             ?.filter((file: any) => file.response?.url || file.url)
             .map((file: any) => ({ id: file.uid, url: file.response.url || file.url })),
-          logo: values.logo
+          image: values.logo
             ?.filter((file: any) => file.response?.url || file.url)
             .map((file: any) => ({ id: file.uid, url: file.response?.url || file.url })),
           metaKeywords: values.metaKeywords?.join(),
         },
         callback: () => {
-          history.push(`/product-module/brands`);
+          history.push(`/product-module/categories`);
         },
       });
       return;
     }
     dispatch({
-      type: 'brands/update',
+      type: 'categories/update',
       payload: {
         ...values,
         id,
+        categoryId:
+          values.categoryId?.length > 0 ? values.categoryId[values.categoryId.length - 1] : null,
         storyCover: values.storyCover
           ?.filter((file: any) => file.response?.url || file.url)
           .map((file: any) => ({ id: file.uid, url: file.response?.url || file.url })),
-        logo: values.logo
+        image: values.image
           ?.filter((file: any) => file.response?.url || file.url)
           .map((file: any) => ({ id: file.uid, url: file.response?.url || file.url })),
         metaKeywords: values.metaKeywords?.join(),
       },
       callback: () => {
-        history.push(`/product-module/brands`);
+        history.push(`/product-module/categories`);
       },
     });
   };
@@ -112,6 +128,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
       scrollMode: 'if-needed',
     });
   };
+
   return (
     <PageHeaderWrapper
       title={getPageTitle({
@@ -136,20 +153,10 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
               >
                 <Input placeholder="Please enter user name" />
               </Form.Item>
-              <Form.Item
-                name="supplierId"
-                label="Supplier"
-                rules={[{ required: true, message: 'Please select your country!' }]}
-              >
-                <Select placeholder="Please select a supplier">
-                  {suppliers.map((supplier: any) => (
-                    <Option value={supplier.id} key={supplier.id}>
-                      {supplier.name}
-                    </Option>
-                  ))}
-                </Select>
+              <Form.Item name="categoryId" label="Parent Category">
+                <Cascader showSearch={{ filter }} options={categories} changeOnSelect />
               </Form.Item>
-              <Form.Item name="logo" label="Logo">
+              <Form.Item name="image" label="Image">
                 <UploadImages request={upload} />
               </Form.Item>
               <Divider orientation="left">Meta Information</Divider>
@@ -189,16 +196,13 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
 
 export default connect(
   ({
-    brands,
-    suppliers,
+    categories,
     loading,
   }: {
-    brands: ModelType;
-    suppliers: any;
+    categories: any;
     loading: { models: { [key: string]: boolean } };
   }) => ({
-    brands,
-    suppliers,
-    loading: loading.models.brands || loading.models.suppliers,
+    categories,
+    loading: loading.models.categories,
   }),
 )(CreateForm);

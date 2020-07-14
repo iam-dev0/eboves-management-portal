@@ -29,22 +29,23 @@ const CreateOrUpdate: React.FC<any> = ({
   }, []);
 
   const onFinish = (values: any) => {
-    if (!isUpdate)
+    if (!isUpdate) {
       dispatch({
         type: 'outlets/create',
         payload: { ...values, managerId: 1, cityId: values.cityId[1] },
         callback: () => {
-          form.resetFields();
           onClose();
+          form.resetFields();
         },
       });
-
+      return;
+    }
     dispatch({
       type: 'outlets/update',
       payload: { ...values, managerId: 1, id: data.id, cityId: values.cityId[1] },
       callback: () => {
-        form.resetFields();
         onClose();
+        form.resetFields();
       },
     });
   };
@@ -75,8 +76,8 @@ const CreateOrUpdate: React.FC<any> = ({
       width={720}
       // loading={loading}
       onClose={() => {
-        form.resetFields();
         onClose();
+        form.resetFields();
       }}
       visible={Open}
       bodyStyle={{ paddingBottom: 80 }}
@@ -88,9 +89,9 @@ const CreateOrUpdate: React.FC<any> = ({
         >
           <Button
             onClick={() => {
+              onClose();
               form.resetFields();
               setEditDrawer({ isUpdate: false, data: undefined });
-              onClose();
             }}
             loading={loading}
             style={{ marginRight: 8 }}

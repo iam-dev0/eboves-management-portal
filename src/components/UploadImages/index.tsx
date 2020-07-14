@@ -14,10 +14,9 @@ const Uploader: React.FC<any> = ({
 }: any) => {
   const [fileList, setfileList] = useState<any>([]);
 
-  useEffect(()=>{
-    if(Array.isArray(value))
-    setfileList(value);
-  },[value])
+  useEffect(() => {
+    if (Array.isArray(value) && value.length>0) setfileList(value);
+  }, [value]);
 
   const handlePreview = async (file: any) => {
     if (file.response?.url || file.url) {
@@ -35,11 +34,7 @@ const Uploader: React.FC<any> = ({
   // eslint-disable-next-line no-shadow
   const onFileListChange = ({ fileList }: any) => {
     setfileList([...fileList]);
-    onChange(
-      fileList
-        .filter((file: any) => file.response?.url || file.url)
-        .map((file: any) => ({ uid: file.uid, url: file.response.url })),
-    );
+    onChange(fileList);
   };
 
   const uploadButton = (

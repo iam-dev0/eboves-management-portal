@@ -1,7 +1,7 @@
 import { DownOutlined, PlusOutlined, RightOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Button, Switch, Input, Tag } from 'antd';
 import React, { useState, useRef } from 'react';
-import { connect,history } from 'umi';
+import { connect, history } from 'umi';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import ProTable, { ProColumns, ActionType, IntlProvider, enUSIntl } from '@ant-design/pro-table';
 import { SorterResult } from 'antd/es/table/interface';
@@ -13,8 +13,7 @@ import style from './index.less';
 const TableList: React.FC<any> = (props) => {
   const [sorter, setSorter] = useState<string>('');
   const actionRef = useRef<ActionType>();
-  const [expandedRowKeys, setExpandedRowKeys] = useState<number[]>([]);
- 
+
   const {
     loading,
     dispatch,
@@ -23,6 +22,9 @@ const TableList: React.FC<any> = (props) => {
 
   const toggleActiveStatus = (id: number) => {
     dispatch({ type: 'brands/toggleActiveStatus', payload: id });
+  };
+  const togglePopularStatus = (id: number) => {
+    dispatch({ type: 'brands/togglePopularStatus', payload: id });
   };
 
   const handleBulkDelete = (ids: any) => {
@@ -36,11 +38,6 @@ const TableList: React.FC<any> = (props) => {
         actionRef.current?.clearSelected();
       },
     });
-  };
-
-  const onEditClickHandler = (record: BrandItem) => {
-    // setEditDrawer({ isUpdate: true, data: record });
-    // setOpenDrawer(true);
   };
 
   const columns: ProColumns<BrandItem>[] = [
@@ -91,9 +88,12 @@ const TableList: React.FC<any> = (props) => {
         return record.active === v;
       },
       renderText: (text, record) => {
-        const active = text === 'Active';
-        if (record.default) return <Tag className="tag-primary-color">Default</Tag>;
-        return <Switch defaultChecked={active} onChange={() => toggleActiveStatus(record.id)} />;
+        return (
+          <Switch
+            defaultChecked={text === 'Active'}
+            onChange={() => toggleActiveStatus(record.id)}
+          />
+        );
       },
     },
     {
@@ -114,9 +114,12 @@ const TableList: React.FC<any> = (props) => {
         return record.active === v;
       },
       renderText: (text, record) => {
-        const active = text === 'Active';
-        if (record.default) return <Tag className="tag-primary-color">Default</Tag>;
-        return <Switch defaultChecked={active} onChange={() => toggleActiveStatus(record.id)} />;
+        return (
+          <Switch
+            defaultChecked={text === 'Active'}
+            onChange={() => togglePopularStatus(record.id)}
+          />
+        );
       },
     },
     {
@@ -141,34 +144,13 @@ const TableList: React.FC<any> = (props) => {
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record: BrandItem) => (
-        <span onClick={() => onEditClickHandler(record)} className="table-operation">
-          <a onClick={()=>history.push(`brands/update/${record.id}`)}>Edit</a>
+        <span className="table-operation">
+          <a onClick={() => history.push(`brands/update/${record.id}`)}>Edit</a>
         </span>
       ),
     },
   ];
 
-  const expandable = {
-    expandedRowKeys,
-    onExpand: (expanded: boolean, record: any) => {
-      setExpandedRowKeys(expanded ? [record.id] : []);
-    },
-    expandIcon: ({ expanded, onExpand, record }: any) =>
-      expanded ? (
-        <DownOutlined onClick={(e) => onExpand(record, e)} />
-      ) : (
-        <RightOutlined onClick={(e) => onExpand(record, e)} />
-      ),
-    expandedRowRender: (record: BrandItem) => (
-      <div className={`customExpendableRow ${style.addressExpand}`}>
-        <p>
-          <span>Address : </span>
-          <span>{record.address}</span>
-        </p>
-      </div>
-    ),
-    rowExpandable: () => true,
-  };
   return (
     <PageHeaderWrapper>
       <IntlProvider value={enUSIntl}>
@@ -207,11 +189,8 @@ const TableList: React.FC<any> = (props) => {
           columns={columns}
           rowSelection={{}}
           pagination={{ showTotal: (total) => `Total ${total} items` }}
-          expandable={expandable}
         />
       </IntlProvider>
-
-  
     </PageHeaderWrapper>
   );
 };

@@ -2,6 +2,8 @@ import {
   DownOutlined,
   PlusOutlined,
   RightOutlined,
+  ApartmentOutlined,
+  DeleteOutlined,
 } from '@ant-design/icons';
 import { Button, Switch, Dropdown, Menu, Input, Tag } from 'antd';
 import React, { useState, useRef } from 'react';
@@ -11,7 +13,6 @@ import ProTable, { ProColumns, ActionType, IntlProvider, enUSIntl } from '@ant-d
 import { SorterResult } from 'antd/es/table/interface';
 import { fetchAllCategories } from './service';
 import { CategoryItem } from './data';
-import style from './index.less';
 
 const TableList: React.FC<any> = (props) => {
   const [sorter, setSorter] = useState<string>('');
@@ -23,9 +24,30 @@ const TableList: React.FC<any> = (props) => {
     // outlets,
   } = props;
 
+  const toggleActiveStatus = (id: number) => {
+    dispatch({
+      type: 'categories/toggleActiveStatus',
+      payload: id,
+      callback: () => {
+        // eslint-disable-next-line no-unused-expressions
+        actionRef.current?.reload();
+        // eslint-disable-next-line no-unused-expressions
+        actionRef.current?.clearSelected();
+      },
+    });
+  };
 
-  const onChangeProductStatus = (id: number, status: boolean) => {
-    dispatch({ type: 'products/updateOutletActiveStatus', payload: id });
+  const handleBulkDelete = (ids: any) => {
+    dispatch({
+      type: 'categories/bulkDelete',
+      payload: ids,
+      callback: () => {
+        // eslint-disable-next-line no-unused-expressions
+        actionRef.current?.reload();
+        // eslint-disable-next-line no-unused-expressions
+        actionRef.current?.clearSelected();
+      },
+    });
   };
 
   const columns: ProColumns<CategoryItem>[] = [
@@ -46,16 +68,15 @@ const TableList: React.FC<any> = (props) => {
           text: 'Inactive',
         },
       },
-      onFilter: (value:any, record:CategoryItem) => {
+      onFilter: (value: any, record: CategoryItem) => {
         const v = value.toLowerCase() === 'true';
         return record.active === v;
       },
       renderText: (text, record) => {
-        const active = text === 'Active';
         return (
           <Switch
-            defaultChecked={active}
-            onChange={(value) => onChangeProductStatus(record.id, value)}
+            defaultChecked={text === 'Active'}
+            onChange={() => toggleActiveStatus(record.id)}
           />
         );
       },
@@ -81,16 +102,34 @@ const TableList: React.FC<any> = (props) => {
       title: 'Action',
       dataIndex: 'option',
       valueType: 'option',
-      render: () => (
+      render: (text, record) => (
         <span className="table-operation">
           <a>View</a> |&nbsp;
-          <a>Delete</a>
+          <a
+            onClick={(e) => {
+              history.push(`categories/update/${record.id}`);
+              e.preventDefault();
+            }}
+          >
+            Edit
+          </a>
+          {record.level !== 2 && (
+            <>
+              |&nbsp;
+              <a
+                onClick={(e) => {
+                  history.push('categories/Create', { categoryId: record.id });
+                  e.preventDefault();
+                }}
+              >
+                <ApartmentOutlined /> Add
+              </a>
+            </>
+          )}
         </span>
       ),
     },
   ];
-
-  
 
   return (
     <PageHeaderWrapper>
@@ -99,7 +138,7 @@ const TableList: React.FC<any> = (props) => {
           loading={loading}
           className="OuterTable"
           headerTitle="Our Outlets"
-          childrenColumnName='childrens'
+          childrenColumnName="childrens"
           actionRef={actionRef}
           rowKey="id"
           search={{ searchText: 'Search', resetText: 'Rest', submitText: 'Submit' }}
@@ -112,31 +151,18 @@ const TableList: React.FC<any> = (props) => {
           params={{
             sorter,
           }}
-          toolBarRender={(action, { selectedRows }) => [
-            <Button type="primary" onClick={() => history.push('/products/Create')}>
+          toolBarRender={(action, { selectedRowKeys }) => [
+            <Button type="primary" onClick={() => history.push('categories/Create')}>
               <PlusOutlined /> New
             </Button>,
-            selectedRows && selectedRows.length > 0 && (
-              <Dropdown
-                overlay={
-                  <Menu
-                    onClick={async (e) => {
-                      if (e.key === 'remove') {
-                        await handleRemove(selectedRows);
-                        action.reload();
-                      }
-                    }}
-                    selectedKeys={[]}
-                  >
-                    <Menu.Item key="remove">remove</Menu.Item>
-                    <Menu.Item key="approval">approve</Menu.Item>
-                  </Menu>
-                }
+            selectedRowKeys && selectedRowKeys.length > 0 && (
+              <Button
+                icon={<DeleteOutlined />}
+                danger
+                onClick={() => handleBulkDelete(selectedRowKeys)}
               >
-                <Button>
-                  button <DownOutlined />
-                </Button>
-              </Dropdown>
+                Delete
+              </Button>
             ),
           ]}
           tableAlertRender={false}
@@ -151,8 +177,14 @@ const TableList: React.FC<any> = (props) => {
 };
 
 export default connect(
-  ({ outlets, loading }: { outlets: any; loading: { models: { [key: string]: boolean } } }) => ({
-    outlets,
-    loading: loading.models.outlets,
+  ({
+    categories,
+    loading,
+  }: {
+    categories: any;
+    loading: { models: { [key: string]: boolean } };
+  }) => ({
+    categories,
+    loading: loading.models.categories,
   }),
 )(TableList);

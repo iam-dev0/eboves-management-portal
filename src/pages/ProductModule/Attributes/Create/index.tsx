@@ -21,7 +21,7 @@ const CreateOrUpdate: React.FC<any> = ({
   const [form] = Form.useForm();
 
   const onFinish = (values: any) => {
-    if (!isUpdate)
+    if (!isUpdate) {
       dispatch({
         type: 'attributes/create',
         payload: values,
@@ -30,7 +30,8 @@ const CreateOrUpdate: React.FC<any> = ({
           onClose();
         },
       });
-
+      return;
+    }
     dispatch({
       type: 'attributes/update',
       payload: { ...values, id: data.id },
@@ -70,7 +71,7 @@ const CreateOrUpdate: React.FC<any> = ({
           >
             Cancel
           </Button>
-          <Button loading={loading} onClick={()=>form.submit()} type="primary" htmlType="submit">
+          <Button loading={loading} onClick={() => form.submit()} type="primary" htmlType="submit">
             Submit
           </Button>
         </div>

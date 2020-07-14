@@ -120,8 +120,28 @@ export default [
                 path: '/product-module/categories',
                 name: 'Categories',
                 icon: 'smile',
-                component: './ProductModule/Categories',
+                hideChildren: true,
                 // authority: ['admin'],
+                routes: [
+                  {
+                    path: '/product-module/categories',
+                    name: 'Categories List',
+                    icon: 'smile',
+                    component: './ProductModule/Categories',
+                  },
+                  {
+                    path: '/product-module/categories/create',
+                    name: 'Create Category',
+                    icon: 'smile',
+                    component: './ProductModule/Categories/Create',
+                  },
+                  {
+                    path: '/product-module/categories/update/:id',
+                    name: 'Update Category',
+                    icon: 'smile',
+                    component: './ProductModule/Categories/Create',
+                  },
+                ],
               },
               {
                 path: '/product-module/attributes',

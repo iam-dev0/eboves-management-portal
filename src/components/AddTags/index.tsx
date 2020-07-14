@@ -22,7 +22,7 @@ const EditableTagGroup: React.FC<any> = ({ onChange,value=[] }) => {
   const [editInputValue, setEditInputValue] = useState<string>('');
 
   useEffect(()=>{
-    if(Array.isArray(value))
+    if(Array.isArray(value) && value.length>0)
     setTags(value);
   },[value])
 

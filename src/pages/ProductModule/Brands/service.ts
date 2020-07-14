@@ -12,6 +12,11 @@ export async function toggleActiveStatus(id: number) {
   return request(`http://localhost:4040/brands/toggle-active/${id}`, option);
 }
 
+export async function togglePopularStatus(id: number) {
+  const option = { method: 'PUT' };
+  return request(`http://localhost:4040/brands/toggle-populary/${id}`, option);
+}
+
 export async function bulkDelete(ids: number[]) {
   const option = { method: 'DELETE', params: ids };
   return request(`http://localhost:4040/brands`, option);
@@ -25,18 +30,11 @@ export async function fetch(id: number) {
   return request(`http://localhost:4040/brands/${id}`);
 }
 
-export async function updateOutlet(data: any) {
+export async function update(data: any) {
   const option = { method: 'PUT', data };
   return request(`http://localhost:4040/brands/${data.id}`, option);
 }
 
-export async function fetchUsers() {
-  return request(`http://localhost:4040/countries`);
-}
-
-export async function fetchCountries() {
-  return request(`http://localhost:4040/countries`);
-}
 
 export async function upload({ data, file, filename, onError, onSuccess }: any) {
   // EXAMPLE: post form-data with 'axios'
@@ -53,7 +51,7 @@ export async function upload({ data, file, filename, onError, onSuccess }: any) 
     method: 'POST',
     data: formData,
   };
-  request(`http://localhost:4040/brands/upload`, option)
+ await  request(`http://localhost:4040/brands/upload`, option)
     .then(({ data: response }) => {
       if (!response) {
         onError(new Error('error while uploading try again'));
@@ -62,10 +60,4 @@ export async function upload({ data, file, filename, onError, onSuccess }: any) 
     .catch((error) => {
       onError(error);
     });
-
-  return {
-    abort() {
-      console.log('upload progress is aborted.');
-    },
-  };
 }

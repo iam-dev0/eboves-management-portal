@@ -4,9 +4,9 @@ export interface BrandItem {
   popularity: boolean;
   active: boolean;
   createdAt: Date;
-  logo1?: string;
-  logo2?: string;
+  logo?: string;
   image?: string;
+  level?:number;
   storyText?: string;
   storyTextColor?: string;
   storyCover?: string;

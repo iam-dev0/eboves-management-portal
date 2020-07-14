@@ -1,4 +1,5 @@
 export interface CategoryItem {
+  level: any;
   id: number;
   name:string;
   active: boolean;
