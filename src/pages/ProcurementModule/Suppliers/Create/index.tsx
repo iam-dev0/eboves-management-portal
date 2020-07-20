@@ -3,10 +3,7 @@ import { Form, Button, Input, Select, Card, Spin, Divider } from 'antd';
 
 import { connect, Dispatch, history } from 'umi';
 import { PageHeaderWrapper, GridContent, getPageTitle, MenuDataItem } from '@ant-design/pro-layout';
-import UploadImages from '@/components/UploadImages';
-import EditableTagGroup from '@/components/AddTags';
-import { upload } from '../service';
-import {ModelType} from '../model';
+import { ModelType } from '../model';
 
 interface CreateFormProps {
   dispatch: Dispatch;
@@ -30,7 +27,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
     loading,
     dispatch,
     brands: { brand },
-    suppliers: { suppliers },
+    suppliers: { suppliers, supplier },
   } = props;
   const { id } = props.match.params;
   const [form] = Form.useForm();
@@ -38,13 +35,9 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
   useEffect(() => {
     if (id)
       dispatch({
-        type: 'brands/fetch',
+        type: 'suppliers/fetchSupplier',
         payload: id,
       });
-    dispatch({
-      type: 'suppliers/fetchSuppliers',
-      payload: id,
-    });
 
     return () => {
       dispatch({
@@ -55,52 +48,27 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
   }, []);
 
   useEffect(() => {
-    if (brand) {
-      const values = {
-        ...brand,
-        logo: !brand.logo || [{ uid: 1, url: brand.logo }],
-        storyCover: !brand.storyCover || [{ uid: 1, url: brand.storyCover }],
-        metaKeywords: brand.metaKeywords?.split(','),
-      };
-      form.setFieldsValue(values);
+    if (supplier.id) {
+      form.setFieldsValue(supplier);
     }
-  }, [brand]);
+  }, [supplier]);
 
   const onFinish = (values: any) => {
     if (!id) {
       dispatch({
-        type: 'brands/create',
-        payload: {
-          ...values,
-          storyCover: values.storyCover
-            ?.filter((file: any) => file.response?.url || file.url)
-            .map((file: any) => ({ id: file.uid, url: file.response.url || file.url })),
-          logo: values.logo
-            ?.filter((file: any) => file.response?.url || file.url)
-            .map((file: any) => ({ id: file.uid, url: file.response?.url || file.url })),
-          metaKeywords: values.metaKeywords?.join(),
-        },
+        type: 'suppliers/create',
+        payload: values,
         callback: () => {
-          history.push(`/product-module/brands`);
+          history.push(`/procurement-module/suppliers`);
         },
       });
       return;
     }
     dispatch({
-      type: 'brands/update',
-      payload: {
-        ...values,
-        id,
-        storyCover: values.storyCover
-          ?.filter((file: any) => file.response?.url || file.url)
-          .map((file: any) => ({ id: file.uid, url: file.response?.url || file.url })),
-        logo: values.logo
-          ?.filter((file: any) => file.response?.url || file.url)
-          .map((file: any) => ({ id: file.uid, url: file.response?.url || file.url })),
-        metaKeywords: values.metaKeywords?.join(),
-      },
+      type: 'suppliers/update',
+      payload: { id, ...values },
       callback: () => {
-        history.push(`/product-module/brands`);
+        history.push(`/procurement-module/suppliers`);
       },
     });
   };
@@ -112,6 +80,15 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
       scrollMode: 'if-needed',
     });
   };
+
+  const prefixSelector = (
+    <Form.Item name="prefix" noStyle>
+      <Select style={{ width: 70 }} defaultValue="92">
+        <Option value="92">+92</Option>
+        {/* <Option value="87">+87</Option> */}
+      </Select>
+    </Form.Item>
+  );
   return (
     <PageHeaderWrapper
       title={getPageTitle({
@@ -130,17 +107,16 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
             >
               <Divider orientation="left">Basic Information</Divider>
               <Form.Item
-                name="name"
-                label="Name"
+                name="companyName"
+                label="Company Name"
                 rules={[{ required: true, message: 'Please enter user name' }]}
               >
                 <Input placeholder="Please enter user name" />
               </Form.Item>
-              <Form.Item
-                name="supplierId"
-                label="Supplier"
-                rules={[{ required: true, message: 'Please select your country!' }]}
-              >
+              <Form.Item name="code" label="Supplier Code">
+                <Input placeholder="enter." />
+              </Form.Item>
+              <Form.Item name="countryId" label="Country">
                 <Select placeholder="Please select a supplier">
                   {suppliers.map((supplier: any) => (
                     <Option value={supplier.id} key={supplier.id}>
@@ -149,29 +125,47 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
                   ))}
                 </Select>
               </Form.Item>
-              <Form.Item name="logo" label="Logo">
-                <UploadImages request={upload} />
-              </Form.Item>
-              <Divider orientation="left">Meta Information</Divider>
 
-              <Form.Item name="metaKeywords" label="Meta Keywords">
-                <EditableTagGroup />
+              <Form.Item label="Brands" name="brands">
+                <Select
+                  mode="multiple"
+                  placeholder="Select attributes"
+                  optionFilterProp="optionLable"
+                >
+                  {suppliers.map((supplier: any) => (
+                    <Option value={supplier.id} key={supplier.id}>
+                      {supplier.name}
+                    </Option>
+                  ))}
+                </Select>
               </Form.Item>
-              <Form.Item name="metaTitle" label="Meta Title">
-                <Input placeholder="Please enter user name" />
+              <Form.Item name="website" label="Website">
+                <Input placeholder="Please enter.." />
               </Form.Item>
-              <Form.Item name="metaDescription" label="Meta Description">
-                <TextArea placeholder="Please enter user name" />
+              <Form.Item name="description" label="Description">
+                <TextArea rows={4} placeholder="Enter.." />
               </Form.Item>
 
-              <Divider orientation="left">Seo Information</Divider>
-              <Form.Item name="storyText" label="Story Text">
-                <TextArea placeholder="Please enter user name" />
+              <Divider orientation="left">Contact Information</Divider>
+
+              <Form.Item
+                name="name"
+                label="Name"
+                rules={[{ required: true, message: "It's required" }]}
+              >
+                <Input placeholder="Please enter." />
               </Form.Item>
-              <Form.Item label="Story Cover">
-                <Form.Item name="storyCover" noStyle>
-                  <UploadImages wall request={upload} />
-                </Form.Item>
+
+              <Form.Item name="email" label="Email">
+                <Input placeholder="Please enter." />
+              </Form.Item>
+
+              <Form.Item
+                name="phone"
+                label="Phone"
+                rules={[{ required: true, message: "It's required" }]}
+              >
+                <Input addonBefore={prefixSelector} />
               </Form.Item>
 
               <Form.Item wrapperCol={{ span: 12, offset: 6 }}>
@@ -199,6 +193,7 @@ export default connect(
   }) => ({
     brands,
     suppliers,
-    loading: loading.models.brands || loading.models.suppliers,
+    // loading: loading.models.suppliers,
+    loading: false,
   }),
 )(CreateForm);

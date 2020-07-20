@@ -7,12 +7,12 @@ import {
 } from '@ant-design/icons';
 import { Button, Switch, Dropdown, Menu, Input } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
-import { connect, history } from 'umi';
+import { connect, history, Link } from 'umi';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import ProTable, { ProColumns, ActionType, IntlProvider, enUSIntl } from '@ant-design/pro-table';
 import { SorterResult } from 'antd/es/table/interface';
-import { TableListItem } from './data';
-import { fetchProducts } from './service';
+import { ProductItem } from '../data';
+import { fetchProducts } from '../service';
 import style from './index.less';
 import NestedTable from './components/VariationList';
 
@@ -24,14 +24,6 @@ function toObject(arr: any): { [key: string]: string | number | boolean | {} | n
   return rv;
 }
 
-const menu = (
-  <Menu>
-    <Menu.Item icon={<EditFilled />}>Edit</Menu.Item>
-    <Menu.Item icon={<DeleteOutlined />}>Delete</Menu.Item>
-    <Menu.Item icon={<PlusOutlined />}>Add New Variation</Menu.Item>
-  </Menu>
-);
-
 const TableList: React.FC<any> = (props) => {
   const [sorter, setSorter] = useState<string>('');
 
@@ -41,22 +33,45 @@ const TableList: React.FC<any> = (props) => {
   const {
     loading,
     dispatch,
-    products: { brands, suppliers },
+    brands: { brands },
+    suppliers: { suppliers },
   } = props;
 
   useEffect(() => {
-    dispatch({ type: 'products/fetchBrands' });
-    dispatch({ type: 'products/fetchSuppliers' });
+    dispatch({ type: 'brands/fetchBrands' });
+    dispatch({ type: 'suppliers/fetchSuppliers' });
   }, []);
 
-  const onChangeProductStatus = (id: number, status: boolean) => {
-    dispatch({ type: 'products/updateProductActiveStatus', payload: { id, active: status } });
+  const toggleProductActiveStatus = (id: number) => {
+    dispatch({ type: 'products/toggleProductActiveStatus', payload: id });
   };
-  const columns: ProColumns<TableListItem>[] = [
+
+  const handleBulkDelete = (ids: any) => {
+    dispatch({
+      type: 'products/bulkDelete',
+      payload: ids,
+      callback: () => {
+        // eslint-disable-next-line no-unused-expressions
+        actionRef.current?.reload();
+        // eslint-disable-next-line no-unused-expressions
+        actionRef.current?.clearSelected();
+      },
+    });
+  };
+
+
+
+  const columns: ProColumns<ProductItem>[] = [
     {
       title: 'Product',
       dataIndex: 'name',
       width: '20%',
+      renderText: (text, record) => (
+        <div>
+          <div>{text}</div>
+          <div className={style.VariationsCount}>{record.variations?.length} variants</div>
+        </div>
+      ),
     },
     {
       title: 'Product Type',
@@ -70,7 +85,7 @@ const TableList: React.FC<any> = (props) => {
         },
       },
       sorter: true,
-      width: '15%',
+      width: '10%',
     },
     {
       title: 'Brands',
@@ -95,6 +110,27 @@ const TableList: React.FC<any> = (props) => {
       width: '15%',
     },
     {
+      title: 'Price',
+      dataIndex: 'price',
+      sorter: true,
+      width: '10%',
+      renderText: (_, record) => {
+        const priceArray = record?.variations?.map((i) => i.price);
+        if (priceArray && priceArray.length > 0) {
+          const max = Math.max.apply(null, priceArray);
+          const min = Math.min.apply(null, priceArray);
+          return max === min ? (
+            <div>PKR {max}</div>
+          ) : (
+            <div>
+              PRK {min}-{max}
+            </div>
+          );
+        }
+        return <div>PKR 0</div>;
+      },
+    },
+    {
       title: 'Active',
       dataIndex: 'active',
       sorter: true,
@@ -108,17 +144,14 @@ const TableList: React.FC<any> = (props) => {
           text: 'Inactive',
         },
       },
-      onFilter: (value:any, record:TableListItem) => {
+      onFilter: (value: any, record: ProductItem) => {
         const v = value.toLowerCase() === 'true';
         return record.active === v;
       },
       renderText: (text, record) => {
         const active = text === 'Active';
         return (
-          <Switch
-            defaultChecked={active}
-            onChange={(value) => onChangeProductStatus(record.id, value)}
-          />
+          <Switch defaultChecked={active} onChange={() => toggleProductActiveStatus(record.id)} />
         );
       },
     },
@@ -143,11 +176,22 @@ const TableList: React.FC<any> = (props) => {
       title: 'Action',
       dataIndex: 'option',
       valueType: 'option',
-      render: (_, record) => (
+      render: (_, record: ProductItem) => (
         <span className="table-operation">
-          <a>View</a> |&nbsp;
-          <Dropdown overlay={menu}>
-            <a>
+          <Link to={`/product-module/products/${record.id}`}>View</Link> |&nbsp;
+          <Dropdown
+            overlay={
+              <Menu>
+                <Menu.Item key="1" icon={<EditFilled />}>
+                <Link to={`/product-module/products/update/${record.id}`}> Edit</Link>
+                </Menu.Item>
+                <Menu.Item key="3" icon={<PlusOutlined />}>
+                  <Link to={`products/${record.id}/variations/create`}>Add SKU</Link>
+                </Menu.Item>
+              </Menu>
+            }
+          >
+            <a onClick={(e) => e.preventDefault()}>
               More <DownOutlined />
             </a>
           </Dropdown>
@@ -172,18 +216,18 @@ const TableList: React.FC<any> = (props) => {
 
       return null;
     },
-    expandedRowRender: (record) => (
+    expandedRowRender: (record: ProductItem) => (
       <div className={style.nestedRows}>
         <NestedTable product={record} />
       </div>
     ),
-    rowExpandable: (record) => record.variations.length > 0,
+    rowExpandable: (record: ProductItem) => record.variations?.length,
   };
 
   return (
     <PageHeaderWrapper>
       <IntlProvider value={enUSIntl}>
-        <ProTable<TableListItem>
+        <ProTable<ProductItem>
           loading={loading}
           className="OuterTable"
           headerTitle="Our Products"
@@ -191,7 +235,7 @@ const TableList: React.FC<any> = (props) => {
           rowKey="id"
           search={{ searchText: 'Search', resetText: 'Rest', submitText: 'Submit' }}
           onChange={(_, _filter, _sorter) => {
-            const sorterResult = _sorter as SorterResult<TableListItem>;
+            const sorterResult = _sorter as SorterResult<ProductItem>;
             if (sorterResult.field && sorterResult.order) {
               setSorter(`${sorterResult.field}_${sorterResult.order}`);
             } else setSorter('');
@@ -199,31 +243,18 @@ const TableList: React.FC<any> = (props) => {
           params={{
             sorter,
           }}
-          toolBarRender={(action, { selectedRows }) => [
-            <Button type="primary" onClick={() => history.push('/products/Create')}>
+          toolBarRender={(action, { selectedRowKeys }) => [
+            <Button type="primary" onClick={() => history.push('products/create')}>
               <PlusOutlined /> New
             </Button>,
-            selectedRows && selectedRows.length > 0 && (
-              <Dropdown
-                overlay={
-                  <Menu
-                    onClick={async (e) => {
-                      if (e.key === 'remove') {
-                        await handleRemove(selectedRows);
-                        action.reload();
-                      }
-                    }}
-                    selectedKeys={[]}
-                  >
-                    <Menu.Item key="remove">remove</Menu.Item>
-                    <Menu.Item key="approval">approve</Menu.Item>
-                  </Menu>
-                }
+            selectedRowKeys && selectedRowKeys.length > 0 && (
+              <Button
+                icon={<DeleteOutlined />}
+                danger
+                onClick={() => handleBulkDelete(selectedRowKeys)}
               >
-                <Button>
-                  button <DownOutlined />
-                </Button>
-              </Dropdown>
+                Delete
+              </Button>
             ),
           ]}
           tableAlertRender={false}
@@ -239,8 +270,20 @@ const TableList: React.FC<any> = (props) => {
 };
 
 export default connect(
-  ({ products, loading }: { products: any; loading: { models: { [key: string]: boolean } } }) => ({
+  ({
     products,
+    brands,
+    suppliers,
+    loading,
+  }: {
+    products: any;
+    brands: any;
+    suppliers: any;
+    loading: { models: { [key: string]: boolean } };
+  }) => ({
+    products,
+    brands,
+    suppliers,
     loading: loading.models.products,
   }),
 )(TableList);

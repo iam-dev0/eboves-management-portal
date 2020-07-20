@@ -1,8 +1,18 @@
 import { Effect, Reducer } from 'umi';
-import { toggleActiveStatus,togglePopularStatus, bulkDelete, create, update, fetch } from './service';
+import {
+  toggleActiveStatus,
+  togglePopularStatus,
+  bulkDelete,
+  create,
+  update,
+  fetch,
+  fetchBrands,
+} from './service';
+import { BrandItem } from './data';
 
 export interface StateType {
-  brand: any;
+  brand?: BrandItem | undefined;
+  brands?: BrandItem[];
 }
 
 export interface ModelType {
@@ -10,15 +20,17 @@ export interface ModelType {
   state: StateType;
   effects: {
     fetch: Effect;
+    fetchBrands: Effect;
     toggleActiveStatus: Effect;
-    togglePopularStatus:Effect;
+    togglePopularStatus: Effect;
     bulkDelete: Effect;
     create: Effect;
     update: Effect;
   };
   reducers: {
     putBrand: Reducer<StateType>;
-    resetStates:Reducer<StateType>;
+    putBrands: Reducer<StateType>;
+    resetStates: Reducer<StateType>;
   };
 }
 
@@ -27,11 +39,19 @@ const BrandsModal: ModelType = {
 
   state: {
     brand: undefined,
+    brands: [],
   },
 
   effects: {
     *toggleActiveStatus({ payload }, { call }) {
       yield call(toggleActiveStatus, payload);
+    },
+    *fetchBrands({ payload }, { call, put }) {
+      const res = yield call(fetchBrands, payload);
+      yield put({
+        type: 'putBrands',
+        payload: Array.isArray(res?.data) ? res.data : [],
+      });
     },
     *togglePopularStatus({ payload }, { call }) {
       yield call(togglePopularStatus, payload);
@@ -63,9 +83,16 @@ const BrandsModal: ModelType = {
         brand: action.payload,
       };
     },
+    putBrands(state, action) {
+      return {
+        ...state,
+        brands: action.payload,
+      };
+    },
     resetStates() {
       return {
-        brand:undefined,
+        brand: undefined,
+        brands: [],
       };
     },
   },

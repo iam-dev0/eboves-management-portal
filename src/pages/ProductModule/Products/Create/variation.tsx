@@ -1,10 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { Form, Button, Card, Input, Row, Col, Divider, Descriptions, Spin, Tooltip } from 'antd';
+import React, { useState, useEffect, ReactElement } from 'react';
+import {
+  Form,
+  Button,
+  Card,
+  Input,
+  Row,
+  Col,
+  Divider,
+  Descriptions,
+  Spin,
+  Tooltip,
+  InputNumber,
+} from 'antd';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import { connect } from 'umi';
-import { getARandomNumber, capitalizeFirstLetter } from '@/utils/utils';
+import { connect,history } from 'umi';
+import {capitalizeFirstLetter } from '@/utils/utils';
 import { PageHeaderWrapper, RouteContext } from '@ant-design/pro-layout';
-import { FormInstance } from 'antd/lib/form';
+import UploadImages from '@/components/UploadImages';
 import dayjs from 'dayjs';
 import styles from './style.less';
 
@@ -22,22 +34,8 @@ export interface FormVarationsValueType {
   barcodes?: Array<BarcodeType>;
 }
 
-const customStructuring = (attributes: any) => {
-  const keys = Object.keys(attributes);
-  const newattributeStruction = attributes
-    .map((item: any, index: number) => ({
-      id: keys[index],
-      ...item,
-    }))
-    .filter(({ value }: any) => value);
-  return newattributeStruction;
-};
-
 const CreateVariationForm: React.FC<any> = (props) => {
-  const [variationForms, setVariationForms] = useState<any[]>([
-    { id: getARandomNumber(), form: React.createRef<FormInstance>() },
-  ]);
-
+  const [form] = Form.useForm();
   const {
     loading,
     dispatch,
@@ -45,26 +43,17 @@ const CreateVariationForm: React.FC<any> = (props) => {
     products: { product },
   } = props;
 
+  const { id } = match.params;
   useEffect(() => {
-    dispatch({ type: 'products/fetchProduct', payload: match.params.id });
+    dispatch({ type: 'products/fetchProduct', payload: id });
+    form.setFieldsValue({ variations: [{}] });
   }, []);
 
-  const addVarition = () => {
-    setVariationForms((state) => [
-      ...state,
-      { id: getARandomNumber(), form: React.createRef<FormInstance>() },
-    ]);
-  };
-
-  const RemoveVariation = (id: number) => {
-    setVariationForms((state) => state.filter((elmt) => id !== elmt.id));
-  };
-
-  const cardHeaderButtons = (index: number) => {
+  const cardHeaderButtons = (remove: any, name: any, show: boolean) => {
     return (
       <>
-        {variationForms.length > 1 && (
-          <span onClick={() => RemoveVariation(index)} className={styles.removeButton}>
+        {show && (
+          <span onClick={() => remove(name)} className={styles.removeButton}>
             x
           </span>
         )}
@@ -72,58 +61,44 @@ const CreateVariationForm: React.FC<any> = (props) => {
     );
   };
 
-  const onSubmit = async () => {
-    const variations: any = [];
-    await variationForms
-      .map(async ({ id, form: { current } }) => {
-        const values: any = await current.validateFields().catch((error: any) => {
-          current.scrollToField(error.errorFields[0].name, {
-            behavior: 'smooth',
-            block: 'center',
-            scrollMode: 'if-needed',
-          });
-          throw Error(error);
+  const getAttributeValues = (attribute: any): any => {
+    if (attribute?.length > 0) {
+      const attributes = [];
+      const incommingAttribute = product?.attributes;
+      // eslint-disable-next-line no-plusplus
+      for (let i = 0; i < incommingAttribute?.length; i++) {
+        attributes.push({
+          id: incommingAttribute[i].id,
+          value: !Array.isArray(attribute[i].value)
+            ? attribute[i].value
+            : attribute[i].value.filterImages[0],
+          alt: attribute[i].alt,
         });
-        if (!values) return;
-        const vlus = values[id];
-        vlus.attribute = customStructuring(vlus.attributes);
-        variations.push(vlus);
-      })
-      .reduce((m, o) => m.then(() => o), Promise.resolve())
-      .then(() => {
-        console.log(variations);
-        dispatch({
-          type: 'products/createOrUpdateVariation',
-          payload: { id: product.id, variations },
-        });
-      })
-      .catch((error) => console.log(error));
+      }
+
+      return attributes;
+    }
+    return undefined;
   };
-  const attributeField = (attribute: any, index: number) => {
-    return (
-      <>
-        <Col lg={18} md={18} sm={18}>
-          <Form.Item
-            label={capitalizeFirstLetter(attribute.name)}
-            name={[attribute.id, 'value']}
-            // fieldKey={[attribute.id, 'attribute']}
-            rules={[{ required: true, message: 'Missing Price' }]}
-          >
-            <Input placeholder="Price" />
-          </Form.Item>
-        </Col>
-        <Col lg={6} md={6} sm={6}>
-          <Form.Item
-            label="alt"
-            name={[attribute.id, 'alt']}
-            // fieldKey={[attribute.id, 'attribute']}
-            rules={[{ required: true, message: 'Missing' }]}
-          >
-            <Input placeholder="enter alter value" />
-          </Form.Item>
-        </Col>
-      </>
-    );
+  const onFinish = (values: any) => {
+    dispatch({
+      type: 'products/createVariations',
+      payload: {
+        // ...values,
+        productId: id,
+        variations: values.variations.map((vairation: any) => {
+          return {
+            ...vairation,
+            images: vairation.images?.filterImages(),
+            attributes: getAttributeValues(vairation.attributes),
+          };
+        }),
+      },
+      callback: (res) => {
+        // eslint-disable-next-line no-restricted-globals
+        if (res) history.push(`/product-module/products/${id}`);
+      },
+    });
   };
 
   const action = (
@@ -143,135 +118,227 @@ const CreateVariationForm: React.FC<any> = (props) => {
   const description = (
     <RouteContext.Consumer>
       {({ isMobile }) => (
-        <Descriptions size="small" column={isMobile ? 1 : 2}>
+        <Descriptions size="small" column={isMobile ? 1 : 3}>
           <Descriptions.Item label="Name">{product?.name}</Descriptions.Item>
           <Descriptions.Item label="Brand">{product?.brand?.name}</Descriptions.Item>
+          <Descriptions.Item label="Supplier">{product?.supplier?.name}</Descriptions.Item>
           <Descriptions.Item label="Product Typoe">{product?.productType}</Descriptions.Item>
           <Descriptions.Item label="Created At">
             {dayjs(product?.createdAt).format('DD-MM-YYYY hh:mm')}
           </Descriptions.Item>
-          {/* <Descriptions.Item label="date">2017-07-07 ~ 2017-08-08</Descriptions.Item>
-            <Descriptions.Item label="des">somethig</Descriptions.Item> */}
         </Descriptions>
       )}
     </RouteContext.Consumer>
   );
 
-  const variationForm = (elemnt: any, index: number) => {
-    const { id }: { id: number } = elemnt;
-    return (
-      <Card
-        title={`${index + 1}) Variation Information`}
-        className={styles.card}
-        bordered={false}
-        key={id}
-        extra={cardHeaderButtons(id)}
-      >
-        <Form layout="vertical" ref={elemnt.form}>
-          <Row gutter={16}>
-            <Col lg={8} md={12} sm={12}>
-              <FormItem name={[id, 'sku']} label="SKU">
-                <Input placeholder="Enter." />
-              </FormItem>
-            </Col>
-            <Col lg={8} md={12} sm={12}>
-              <FormItem name={[id, 'slug']} label="Slug">
-                <Input placeholder="Enter." />
-              </FormItem>
-            </Col>
-            <Col lg={8} md={12} sm={12}>
-              <FormItem name={[id, 'price']} label="Retail Price">
-                <Input placeholder="Enter." />
-              </FormItem>
-            </Col>
-            {product?.attributes && product?.attributes?.length > 1 && (
-              <Col lg={24} md={24} sm={24}>
-                <Divider orientation="left">Attributes</Divider>
-                <Form.List name={[id, 'attributes']}>
-                  {() => {
-                    return (
-                      <div>
-                        <Row gutter={12}>
-                          {product?.attributes.map((attribute: any, index: number) => (
-                            <>{attributeField(attribute, index)}</>
-                          ))}
-                        </Row>
-                      </div>
-                    );
-                  }}
-                </Form.List>
-              </Col>
-            )}
-            <Col lg={24} md={24} sm={24}>
-              <Divider orientation="left">Barcodes</Divider>
-              <Form.List name={[id, 'barcodes']}>
-                {(fields, { add, remove }) => {
-                  return (
-                    <div>
-                      {fields.map((field) => (
-                        <Row key={field.key} gutter={12}>
-                          <Col lg={11} md={10} sm={10}>
-                            <Form.Item
-                              {...field}
-                              label="Barcode"
-                              name={[field.name, 'barcode']}
-                              fieldKey={[field.fieldKey, 'barcode']}
-                              rules={[{ required: true, message: 'Missing barcode' }]}
-                            >
-                              <Input placeholder="barcode" />
-                            </Form.Item>
-                          </Col>
-                          <Col lg={11} md={10} sm={10}>
-                            <Form.Item
-                              {...field}
-                              label="Supplier Price"
-                              name={[field.name, 'supplierPrice']}
-                              fieldKey={[field.fieldKey, 'price']}
-                              rules={[{ required: true, message: 'Missing Price' }]}
-                            >
-                              <Input placeholder="Price" />
-                            </Form.Item>
-                          </Col>
-                          <Col lg={2} md={2} sm={2}>
-                            <MinusCircleOutlined
-                              style={{ marginTop: '40px' }}
-                              onClick={() => {
-                                remove(field.name);
-                              }}
-                            />
-                          </Col>
-                        </Row>
-                      ))}
-
-                      <Form.Item>
-                        <Button
-                          type="dashed"
-                          onClick={() => {
-                            add();
-                          }}
-                          block
-                        >
-                          <PlusOutlined /> Add field
-                        </Button>
-                      </Form.Item>
-                    </div>
-                  );
-                }}
-              </Form.List>
-            </Col>
-          </Row>
-        </Form>
-      </Card>
-    );
-  };
-
   const extra = (
     <div style={{ marginTop: '35px' }}>
-      <Button type="primary" onClick={onSubmit}>
+      <Button type="primary" onClick={() => form.submit()}>
         Submit
       </Button>
     </div>
   );
+
+  const Barcodes = (fields: any, { add, remove }: any): any => {
+    return (
+      <div>
+        <Divider orientation="left">Barcodes</Divider>
+        {fields.map((field: any) => (
+          <Row key={field.key} gutter={12}>
+            <Col lg={11} md={10} sm={10}>
+              <Form.Item
+                {...field}
+                label="Barcode"
+                name={[field.name, 'barcode']}
+                fieldKey={[field.key, 'barcode']}
+                rules={[{ required: true, message: 'Missing barcode' }]}
+              >
+                <Input placeholder="barcode" />
+              </Form.Item>
+            </Col>
+            <Col lg={8} md={10} sm={10}>
+              <Form.Item
+                {...field}
+                label="Supplier Price"
+                name={[field.name, 'supplierPrice']}
+                fieldKey={[field.key, 'price']}
+                rules={[{ required: true, message: 'Missing Price' }]}
+              >
+                <InputNumber
+                  defaultValue={0}
+                  formatter={(value) => `Rs. ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                  parser={(value = '0') => value.replace(/Rs.\s?|(,*)/g, '')}
+                />
+              </Form.Item>
+            </Col>
+            <Col lg={2} md={2} sm={2}>
+              <MinusCircleOutlined
+                style={{ marginTop: '40px' }}
+                onClick={() => {
+                  remove(field.name);
+                }}
+              />
+            </Col>
+          </Row>
+        ))}
+
+        <Form.Item>
+          <Button
+            type="dashed"
+            onClick={() => {
+              add();
+            }}
+            block
+          >
+            <PlusOutlined /> Add field
+          </Button>
+        </Form.Item>
+      </div>
+    );
+  };
+
+  const AttributeItem = (attribute: any, index: number) => {
+    switch (attribute.type) {
+      case 'image':
+        return (
+          <>
+            <Col lg={8} md={4} sm={4}>
+              <Form.Item
+                label={capitalizeFirstLetter(attribute.name)}
+                name={[index, 'value']}
+                // fieldKey={[attribute.id, 'attribute']}
+              >
+                <UploadImages showUploadButton />
+              </Form.Item>
+            </Col>
+            <Col lg={6} md={2} sm={4}>
+              <Form.Item
+                label="Alt"
+                name={[index, 'alt']}
+                // fieldKey={[attribute.id, 'attribute']}
+                rules={[{ required: true, message: 'Missing' }]}
+              >
+                <Input placeholder="enter alter value" width="20px" />
+              </Form.Item>
+            </Col>
+          </>
+        );
+      default:
+        return (
+          <Col lg={18} md={18} sm={18}>
+            <Form.Item
+              label={capitalizeFirstLetter(attribute.name)}
+              name={[index, 'value']}
+              // fieldKey={[attribute.id, 'attribute']}
+              rules={[{ required: true, message: 'Missing Price' }]}
+            >
+              <Input placeholder="enter here" />
+            </Form.Item>
+          </Col>
+        );
+    }
+  };
+  const AttributesList = () => {
+    return (
+      <div>
+        <Divider orientation="left">Attributes</Divider>
+        <Row gutter={12}>
+          {product?.attributes?.map((attribute: any, index: number) =>
+            AttributeItem(attribute, index),
+          )}
+        </Row>
+      </div>
+    );
+  };
+
+  const FormVaritions = (fields: any, { add, remove }: any) => {
+    return (
+      <div>
+        {fields.map((field: any) => (
+          <Card
+            title={`${field.key + 1}) Variation Information`}
+            className={styles.card}
+            bordered={false}
+            key={field.key}
+            extra={cardHeaderButtons(remove, field.name, fields.length > 1)}
+          >
+            <Row gutter={16}>
+              <Col lg={14} md={14} sm={24}>
+                <FormItem
+                  name={[field.name, 'sku']}
+                  label="SKU"
+                  rules={[{ required: true, message: 'Sku is required' }]}
+                >
+                  <Input placeholder="Enter." />
+                </FormItem>
+              </Col>
+              <Col lg={10} md={10} sm={24}>
+                <FormItem
+                  name={[field.name, 'price']}
+                  label="Retail Price"
+                  rules={[{ required: true, message: 'price is required' }]}
+                >
+                  <InputNumber
+                    defaultValue={0}
+                    formatter={(value) => `Rs. ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                    parser={(value = '0') => value.replace(/Rs.\s?|(,*)/g, '')}
+                  />
+                </FormItem>
+              </Col>
+            </Row>
+            <Row gutter={16}>
+              <Col lg={24} md={24} sm={24}>
+                <FormItem name={[field.name, 'shortDescription']} label="Feature Description">
+                  <Input.TextArea placeholder="Enter." />
+                </FormItem>
+              </Col>
+            </Row>
+            <Row gutter={16}>
+              <Col lg={24} md={24} sm={24}>
+                <FormItem name={[field.name, 'images']} label="Images">
+                  <UploadImages wall />
+                </FormItem>
+              </Col>
+            </Row>
+            <Row gutter={16}>
+              {product?.attributes?.length > 0 && (
+                <Col lg={22} md={22} sm={22} offset={1}>
+                  <Form.List name={[field.name, 'attributes']}>{AttributesList}</Form.List>
+                </Col>
+              )}
+            </Row>
+            <Row gutter={16}>
+              <Col lg={22} md={22} sm={22} offset={1}>
+                <Form.List name={[field.name, 'barcodes']}>{Barcodes}</Form.List>
+              </Col>
+            </Row>
+          </Card>
+        ))}
+
+        <Form.Item>
+          <div className={styles.addfloadbutton}>
+            <Tooltip title="Add SKU">
+              <Button
+                shape="circle"
+                type="primary"
+                icon={<PlusOutlined />}
+                size="large"
+                onClick={add}
+              />
+            </Tooltip>
+          </div>
+        </Form.Item>
+      </div>
+    );
+  };
+
+  const onFinishFailed = (error: any) => {
+    form.scrollToField(error.errorFields[0].name, {
+      behavior: 'smooth',
+      block: 'center',
+      scrollMode: 'if-needed',
+    });
+  };
   return (
     <PageHeaderWrapper
       content={description}
@@ -280,32 +347,16 @@ const CreateVariationForm: React.FC<any> = (props) => {
       extraContent={extra}
     >
       <Spin spinning={loading}>
-        <div className={styles.addfloadbutton}>
-          <Tooltip title="add new variation">
-            <Button
-              shape="circle"
-              type="primary"
-              icon={<PlusOutlined />}
-              size="large"
-              onClick={addVarition}
-            />
-          </Tooltip>
-        </div>
-
-        {variationForms.map((elemnt, index) => variationForm(elemnt, index))}
+        <Form form={form} onFinish={onFinish} layout="vertical" onFinishFailed={onFinishFailed}>
+          <Form.List name="variations">{FormVaritions}</Form.List>
+        </Form>
       </Spin>
     </PageHeaderWrapper>
   );
 };
 
 export default connect(
-  ({
-    products,
-    loading,
-  }: {
-    products: any;
-    loading: { models: { [key: string]: boolean } };
-  }) => ({
+  ({ products, loading }: { products: any; loading: { models: { [key: string]: boolean } } }) => ({
     products,
     loading: loading.models.products,
   }),

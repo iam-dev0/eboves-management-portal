@@ -6,6 +6,14 @@ import defaultSettings from '../config/defaultSettings';
 
 const { pwa } = defaultSettings;
 
+// eslint-disable-next-line no-extend-native
+Array.prototype.filterImages = function () {
+  return this.filter((file: any) => file.response?.url || file.url).map((file: any) => ({
+    id: file.uid,
+    url: file.response?.url || file.url,
+  }));
+};
+
 // if pwa is true
 if (pwa) {
   // Notify user if offline now

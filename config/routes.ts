@@ -64,10 +64,22 @@ export default [
                     component: './ProductModule/Products/List',
                   },
                   {
-                    path: '/product-module/products/Create',
+                    path: '/product-module/products/create',
                     name: 'Create Product',
                     icon: 'smile',
                     component: './ProductModule/Products/Create',
+                  },
+                  {
+                    path: '/product-module/products/update/:id',
+                    name: 'Create Product',
+                    icon: 'smile',
+                    component: './ProductModule/Products/Create',
+                  },
+                  {
+                    path: '/product-module/products/:id/variations/create',
+                    name: 'Create Variation',
+                    icon: 'smile',
+                    component: './ProductModule/Products/Create/variation',
                   },
                   {
                     path: '/product-module/products/:id',
@@ -76,10 +88,10 @@ export default [
                     component: './ProductModule/Products/View',
                   },
                   {
-                    path: '/product-module/products/:id/variation/Create',
-                    name: 'Create Variation',
+                    path: '/product-module/products/:id/:vid',
+                    name: 'View Product',
                     icon: 'smile',
-                    component: './ProductModule/Products/Create/variation',
+                    component: './ProductModule/Products/View',
                   },
                 ],
               },
@@ -158,16 +170,28 @@ export default [
             icon: 'crown',
             routes: [
               {
-                path: '/procurement-module/supplier',
+                path: '/procurement-module/suppliers',
                 name: 'Suppliers',
                 icon: 'smile',
                 hideChildren: true,
                 routes: [
                   {
-                    path: '/procurement-module/supplier',
+                    path: '/procurement-module/suppliers',
                     name: 'Suppliers List',
                     icon: 'smile',
-                    component: './ProductModule/Products/List',
+                    component: './ProcurementModule/Suppliers',
+                  },
+                  {
+                    path: '/procurement-module/suppliers/create',
+                    name: 'Create Supplier',
+                    icon: 'smile',
+                    component: './ProcurementModule/Suppliers/Create',
+                  },
+                  {
+                    path: '/procurement-module/suppliers/update/:id',
+                    name: 'Update Supplier',
+                    icon: 'smile',
+                    component: './ProcurementModule/Suppliers/Create',
                   },
                 ],
               },

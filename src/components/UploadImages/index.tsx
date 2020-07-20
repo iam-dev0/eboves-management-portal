@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Upload, notification } from 'antd';
-import { PlusOutlined, InboxOutlined } from '@ant-design/icons';
+import { Upload, notification, Button } from 'antd';
+import { PlusOutlined, InboxOutlined, UploadOutlined } from '@ant-design/icons';
 
 const { Dragger } = Upload;
 
@@ -15,7 +15,7 @@ const Uploader: React.FC<any> = ({
   const [fileList, setfileList] = useState<any>([]);
 
   useEffect(() => {
-    if (Array.isArray(value) && value.length>0) setfileList(value);
+    if (Array.isArray(value) && value.length > 0) setfileList(value);
   }, [value]);
 
   const handlePreview = async (file: any) => {
@@ -59,7 +59,6 @@ const Uploader: React.FC<any> = ({
           style={{ margin: '5px' }}
           accept=".JPEG,.JPG,.PNG,.gif,.jfif,.octet-stream"
         >
-          {/* {fileList.length >= 8 && showUploadButton ? null : uploadButton} */}
           <p className="ant-upload-drag-icon">
             <InboxOutlined />
           </p>
@@ -68,7 +67,7 @@ const Uploader: React.FC<any> = ({
       ) : (
         <Upload
           customRequest={request}
-          listType="picture-card"
+          listType={!showUploadButton ? 'picture-card' : undefined}
           fileList={fileList}
           onPreview={handlePreview}
           onRemove={onDeleteHandler}
@@ -77,7 +76,13 @@ const Uploader: React.FC<any> = ({
           accept=".JPEG,.JPG,.PNG,.gif,.jfif,.octet-stream"
           multiple
         >
-          {fileList.length >= limit && !showUploadButton ? null : uploadButton}
+          {showUploadButton ? (
+            <Button>
+              <UploadOutlined /> Click to Upload
+            </Button>
+          ) : (
+            uploadButton
+          )}
         </Upload>
       )}
     </div>

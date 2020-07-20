@@ -1,9 +1,10 @@
 import { Effect, Reducer } from 'umi';
-import { toggleActiveStatus, bulkDelete,createAttribute,updateAttribute } from './service';
-// import { BasicListItemDataType } from './data.d';
+import { toggleActiveStatus, bulkDelete,createAttribute,updateAttribute, fetchAttributes } from './service';
+import { AttributeItem } from './data';
+
 
 export interface StateType {
-  list: any[];
+  attributes: AttributeItem[];
 }
 
 export interface ModelType {
@@ -14,15 +15,18 @@ export interface ModelType {
     bulkDelete: Effect;
     create:Effect;
     update:Effect;
+    fetchAttributes:Effect;
   };
-  reducers: {};
+  reducers: {
+    putAttributes: Reducer<StateType>;
+  };
 }
 
 const BrandsModal: ModelType = {
   namespace: 'attributes',
 
   state: {
-    list: [],
+    attributes: [],
   },
 
   effects: {
@@ -31,6 +35,14 @@ const BrandsModal: ModelType = {
     },
     *bulkDelete({ payload, callback }, { call }) {
       yield call(bulkDelete, payload);
+      if (callback) callback();
+    },
+    *fetchAttributes({ payload, callback }, { call,put }) {
+     const res= yield call(fetchAttributes, payload);
+      yield put({
+        type: 'putAttributes',
+        payload: Array.isArray(res?.data) ? res.data : [],
+      });
       if (callback) callback();
     },
     *create({ payload, callback }, { call }) {
@@ -44,7 +56,14 @@ const BrandsModal: ModelType = {
     
   },
 
-  reducers: {},
+  reducers: {
+    putAttributes(state, action) {
+      return {
+        ...state,
+        attributes: action.payload,
+      };
+    },
+  },
 };
 
 export default BrandsModal;

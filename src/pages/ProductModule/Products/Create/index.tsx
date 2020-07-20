@@ -1,117 +1,165 @@
-import React, { useState, useEffect } from 'react';
-import { Form, Button, Input, Select, Row, Upload, Col, Tag, Card,Spin } from 'antd';
-import { InboxOutlined } from '@ant-design/icons';
-import { connect, Dispatch,history } from 'umi';
-import { PageHeaderWrapper, GridContent,getPageTitle, MenuDataItem } from '@ant-design/pro-layout';
-
-
-export interface FormValueType {
-  name?: string;
-  supplier?: number;
-  brand?: number;
-  productType?: string;
-  stockAvailableAt?: string;
-  category?: number;
-  subCategory?: number;
-  subSubCategory?: number;
-}
+import React, { useEffect } from 'react';
+import { Form, Button, Input, Select, Row, Col, Tag, Card, Spin, Cascader, Divider } from 'antd';
+import { connect, Dispatch, history } from 'umi';
+import { PageHeaderWrapper, GridContent, getPageTitle, MenuDataItem } from '@ant-design/pro-layout';
+import UploadImages from '@/components/UploadImages';
+import EditableTagGroup from '@/components/AddTags';
+import { upload } from '../service';
+import { AttributeItem } from '../../Attributes/data';
+import { findPath } from '@/utils/utils';
 
 interface CreateFormProps {
   dispatch: Dispatch;
   loading: boolean;
   products: any;
-  route:MenuDataItem;
+  brands: any;
+  match: any;
+  categories: any;
+  attributes: any;
+  suppliers: any;
+  route: MenuDataItem;
 }
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
 const { Option } = Select;
 
-const productInitialValues: FormValueType = {
+const productInitialValues = {
   productType: 'eboves',
   stockAvailableAt: 'web',
 };
 
+const filter = (inputValue: any, path: any): any => {
+  return path.some(
+    (option: any) => option.label.toLowerCase().indexOf(inputValue.toLowerCase()) > -1,
+  );
+};
 const CreateForm: React.FC<CreateFormProps> = (props) => {
-  const [productForm] = Form.useForm();
-  const [Subcategories, SetSubcategories] = useState<
-    { id: number; name: string; categoryId: number }[]
-  >([]);
-  const [SubSubcategories, SetSubSubcategories] = useState<
-    { id: number; name: string; categoryId: number }[]
-  >([]);
-
+  const [form] = Form.useForm();
+  const { id } = props.match.params;
   const {
     loading,
     dispatch,
-    products: { brands, categories, suppliers, attributes },
+    products: { product },
+    brands: { brands },
+    categories: { categories },
+    suppliers: { suppliers },
+    attributes: { attributes },
   } = props;
 
   useEffect(() => {
-    dispatch({ type: 'products/fetchBrands' });
-    dispatch({ type: 'products/fetchSuppliers' });
-    dispatch({ type: 'products/fetchAttributes' });
-    dispatch({ type: 'products/fetchCategories' });
+    if (product.id) {
+      const path = findPath(categories, {
+        id: product.categoryId,
+      })?.map((item: any) => item.id);
+
+      const values = {
+        ...product,
+        categoryId: path,
+        images: product.images?.map((image: any) => ({
+          uid: image.id,
+          url: image.image,
+        })),
+        attributes: product.attributes?.map((attribute: any) => attribute.id),
+        descriptionImage: !product.descriptionImage || [{ uid: 1, url: product.descriptionImage }],
+        metaKeywords: product.metaKeywords?.split(','),
+      };
+      form.setFieldsValue(values);
+    }
+  }, [product, categories]);
+
+  useEffect(() => {
+    if (id) dispatch({ type: 'products/fetchProduct', payload: id });
+    dispatch({ type: 'suppliers/fetchSuppliers' });
+    dispatch({ type: 'categories/fetchCategories' });
+    dispatch({ type: 'brands/fetchBrands' });
+    dispatch({ type: 'attributes/fetchAttributes' });
+    dispatch({ type: 'categories/fetchCategories' });
+    return () => form.resetFields();
   }, []);
 
-  const onCategoryChangeHandler = (value: number) => {
-    productForm.setFieldsValue({ subCategory: null, subSubCategory: null });
-    dispatch({
-      type: 'products/fetchSubcategores',
-      payload: value,
-      callback: (response: any) => SetSubcategories(response),
-    });
-  };
-  const onSubCategoryChangeHandler = (value: number) => {
-    productForm.setFieldsValue({ subSubCategory: null });
-    dispatch({
-      type: 'products/fetchSubcategores',
-      payload: value,
-      callback: (response: any) => SetSubSubcategories(response),
-    });
-  };
-
-  const normFile = (e: any) => {
-    // console.log('Upload event:', e);
-    if (Array.isArray(e)) {
-      return e;
-    }
-    return e && e.fileList;
-  };
-
   const onFinish = (values: any) => {
+    if (!id) {
+      dispatch({
+        type: 'products/create',
+        payload: {
+          ...values,
+          categoryId: values.categoryId[2],
+          images: values.images?.filterImages(),
+          descriptionImage: values.descriptionImage?.filterImages(),
+          metaKeywords: values.metaKeywords?.join(),
+        },
+        callback: (res) => {
+          if (res) history.push(`/product-module/products/${res.id}/variations/create`);
+        },
+      });
+      return;
+    }
+
     dispatch({
-      type: 'products/create',
-      payload: values,
-      callback:(res)=>{history.push(`/products/${res.id}/variation/Create`)}
+      type: 'products/updateProduct',
+      payload: {
+        ...values,
+        id,
+        categoryId: values.categoryId[2],
+        images: values.images?.filterImages(),
+        descriptionImage: values.descriptionImage?.filterImages(),
+        metaKeywords: values.metaKeywords?.join(),
+      },
+      callback: (res) => {
+        if (res) history.push(`/product-module/products`);
+      },
+    });
+  };
+
+  const onFinishFailed = (error: any) => {
+    form.scrollToField(error.errorFields[0].name, {
+      behavior: 'smooth',
+      block: 'center',
+      scrollMode: 'if-needed',
     });
   };
   return (
-    <PageHeaderWrapper title={getPageTitle({
-      title:props.route.name,
-    })}>
+    <PageHeaderWrapper
+      title={getPageTitle({
+        title: props.route.name,
+      })}
+    >
       <GridContent>
         <Spin spinning={loading}>
           <Card bordered={false}>
+            <Divider orientation="left">Product Basic Information</Divider>
             <Form
               layout="vertical"
-              form={productForm}
+              form={form}
               initialValues={productInitialValues}
               onFinish={onFinish}
+              onFinishFailed={onFinishFailed}
             >
               <Row gutter={16}>
                 <Col lg={24} md={24} sm={24}>
                   <FormItem
                     name="name"
                     label="Name"
-                    // rules={[{ required: true, message: 'its is required!' }]}
+                    rules={[{ required: true, message: 'it is required!' }]}
                   >
                     <Input placeholder="Enter here.." />
                   </FormItem>
                 </Col>
                 <Col lg={12} md={12} sm={12}>
-                  <FormItem name="supplierId" label="Supplier">
-                    <Select placeholder="please select">
+                  <FormItem
+                    name="supplierId"
+                    label="Supplier"
+                    rules={[{ required: true, message: 'it is required!' }]}
+                  >
+                    <Select
+                      placeholder="please select"
+                      filterOption={(input, option) =>
+                        option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                      }
+                      showSearch
+                      autoClearSearchValue
+                    >
                       {suppliers &&
                         suppliers.map((supplier: { id: number; name: string }) => (
                           <Option key={supplier.id} value={supplier.id}>
@@ -122,8 +170,19 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
                   </FormItem>
                 </Col>
                 <Col lg={12} md={12} sm={12}>
-                  <FormItem name="brandId" label="Brand">
-                    <Select placeholder="please select">
+                  <FormItem
+                    name="brandId"
+                    label="Brand"
+                    rules={[{ required: true, message: 'it is required!' }]}
+                  >
+                    <Select
+                      placeholder="please select"
+                      filterOption={(input, option) =>
+                        option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                      }
+                      showSearch
+                      autoClearSearchValue
+                    >
                       {brands &&
                         brands.map((brand: { id: number; name: string }) => (
                           <Option key={brand.id} value={brand.id}>
@@ -151,92 +210,49 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
                   </FormItem>
                 </Col>
 
-                <Col lg={8} md={8} sm={8}>
-                  <FormItem name="categoryId" label="Category">
-                    <Select onChange={onCategoryChangeHandler} placeholder="please select">
-                      {categories &&
-                        categories.map((category: { id: number; name: string }) => (
-                          <Option key={category.id} value={category.id}>
-                            {category.name}
-                          </Option>
-                        ))}
-                    </Select>
-                  </FormItem>
-                </Col>
-                <Col lg={8} md={8} sm={8}>
-                  <FormItem name="subCategoryId" label="Sub Category">
-                    <Select placeholder="please select" onChange={onSubCategoryChangeHandler}>
-                      {Subcategories &&
-                        Subcategories.map(
-                          (category: { id: number; name: string; categoryId: number }) => {
-                            return (
-                              <Option key={category.id} value={category.id}>
-                                {category.name}{' '}
-                              </Option>
-                            );
-                          },
-                        )}
-                    </Select>
-                  </FormItem>
-                </Col>
-                <Col lg={8} md={8} sm={8}>
-                  <FormItem label="Sub Sub Category" name="subSubCategoryId">
-                    <Select placeholder="please select">
-                      {SubSubcategories &&
-                        SubSubcategories.map(
-                          (category: { id: number; name: string; categoryId: number }) => {
-                            return (
-                              <Option key={category.id} value={category.id}>
-                                {category.name}{' '}
-                              </Option>
-                            );
-                          },
-                        )}
-                    </Select>
+                <Col lg={24} md={24} sm={24}>
+                  <FormItem
+                    name="categoryId"
+                    label="Category"
+                    rules={[{ required: true, message: 'it is required!' }]}
+                  >
+                    <Cascader showSearch={{ filter }} options={categories} />
                   </FormItem>
                 </Col>
                 <Col lg={24} md={24} sm={24}>
-                  <FormItem
-                    name="description"
-                    label="Description"
-                    // rules={[{ required: true, message: '', min: 5 }]}
-                  >
+                  <FormItem name="description" label="Description">
+                    <TextArea rows={4} placeholder="Enter.." />
+                  </FormItem>
+                </Col>
+                <Col lg={24} md={24} sm={24}>
+                  <FormItem name="howToUse" label="How To Use">
                     <TextArea rows={4} placeholder="Enter.." />
                   </FormItem>
                 </Col>
                 <Col lg={24} md={24} sm={24}>
                   <Form.Item label="Images">
-                    <Form.Item
-                      name="images"
-                      valuePropName="fileList"
-                      getValueFromEvent={normFile}
-                      noStyle
-                    >
-                      <Upload.Dragger listType="picture-card" name="files" action="/upload.do">
-                        <p className="ant-upload-drag-icon">
-                          <InboxOutlined />
-                        </p>
-                        <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                        <p className="ant-upload-hint">Support for a single or bulk upload.</p>
-                      </Upload.Dragger>
+                    <Form.Item name="images" noStyle>
+                      <UploadImages request={upload} wall />
                     </Form.Item>
                   </Form.Item>
                 </Col>
-
                 <Col lg={24} md={24} sm={24}>
-                  <FormItem
-                    label="Attributes"
-                    name="attributes"
-                    // rules={[{ required: true, message: '', min: 5 }]}
-                  >
+                  <Form.Item label="Description Image">
+                    <Form.Item name="descriptionImage" noStyle>
+                      <UploadImages request={upload} wall />
+                    </Form.Item>
+                  </Form.Item>
+                </Col>
+                <Col lg={24} md={24} sm={24}>
+                  <FormItem label="Attributes" name="attributes">
                     <Select
                       mode="multiple"
                       placeholder="Select attributes"
-                      size="large"
+                      size='large'
                       // optionLabelProp="optionLable"
                       optionFilterProp="optionLable"
                     >
-                      {attributes.map((attribute: { id: number; name: string; type: string }) => (
+                      {attributes.map((attribute: AttributeItem) => (
                         <Option
                           key={attribute.id}
                           value={attribute.id}
@@ -248,6 +264,22 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
                       ))}
                     </Select>
                   </FormItem>
+                </Col>
+                <Divider orientation="left">Seo Information</Divider>
+                <Col lg={24} md={24} sm={24}>
+                  <Form.Item name="metaKeywords" label="Meta Keywords">
+                    <EditableTagGroup />
+                  </Form.Item>
+                </Col>
+                <Col lg={24} md={24} sm={24}>
+                  <Form.Item name="metaTitle" label="Meta Title">
+                    <Input placeholder="Please enter user name" />
+                  </Form.Item>
+                </Col>
+                <Col lg={24} md={24} sm={24}>
+                  <Form.Item name="metaDescription" label="Meta Description">
+                    <TextArea placeholder="Please enter user name" />
+                  </Form.Item>
                 </Col>
                 <Col lg={24} md={24} sm={24}>
                   <FormItem>
@@ -268,12 +300,24 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
 export default connect(
   ({
     products,
+    categories,
+    brands,
+    suppliers,
+    attributes,
     loading,
   }: {
     products: any;
+    attributes: any;
+    categories: any;
+    brands: any;
+    suppliers: any;
     loading: { models: { [key: string]: boolean } };
   }) => ({
     products,
-    loading: loading.models.products,
+    attributes,
+    categories,
+    brands,
+    suppliers,
+    loading: loading.models.products || loading.models.products || loading.models.attributes,
   }),
 )(CreateForm);

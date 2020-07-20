@@ -171,7 +171,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
                 <TextArea placeholder="Please enter user name" />
               </Form.Item>
 
-              <Divider orientation="left">Extended Information</Divider>
+              <Divider orientation="left">Seo Information</Divider>
               <Form.Item name="storyText" label="Story Text">
                 <TextArea placeholder="Please enter user name" />
               </Form.Item>

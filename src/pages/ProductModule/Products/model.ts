@@ -1,16 +1,15 @@
 import { Effect, Reducer } from 'umi';
 import {
   postProduct,
-  getAllBrands,
-  getAllSuppliers,
-  getAllcategories,
-  getAllAttributes,
   getProduct,
-  getSubCategories,
   fetchProductVariations,
   fetchVariation,
-  postVariation,
-  updateProductStatus,
+  createVariations,
+  toggleProductActiveStatus,
+  fetchProductFullInfo,
+  updateProduct,
+  bulkDelete,
+  toggleVariationActiveStatus,
 } from './service';
 
 export interface StateType {}
@@ -19,22 +18,17 @@ export interface ModelType {
   state?: StateType;
   effects: {
     create: Effect;
-    createOrUpdateVariation: Effect;
-    fetchBrands: Effect;
-    fetchSuppliers: Effect;
-    fetchAttributes: Effect;
-    fetchCategories: Effect;
-    fetchSubcategores: Effect;
-    updateProductActiveStatus: Effect;
+    createVariations: Effect;
+    toggleProductActiveStatus: Effect;
     fetchProductVariations: Effect;
     fetchVariation: Effect;
+    updateProduct:Effect;
     fetchProduct: Effect;
+    fetchProductFullInfo: Effect;
+    bulkDelete:Effect;
+    toggleVariationActiveStatus:Effect;
   };
   reducers?: {
-    brandList: Reducer<StateType>;
-    categoriesList: Reducer<StateType>;
-    attributeList: Reducer<StateType>;
-    suppliers: Reducer<StateType>;
     productInfo: Reducer<StateType>;
     putVaritionList: Reducer<StateType>;
     variationInfo: Reducer<StateType>;
@@ -44,33 +38,24 @@ export interface ModelType {
 const BrandsModal: ModelType = {
   namespace: 'products',
   state: {
-    product: undefined,
+    product: {},
     variationsList: [],
-    variation:undefined,
-    brands: [],
-    suppliers: [],
-    attributes: [],
-    categories: [],
+    variation: {},
   },
   effects: {
     *create({ payload, callback }, { call }) {
       const response = yield call(postProduct, payload);
-      if (callback) callback(response.data);
+      if (callback) callback(response?.data);
     },
-
-    *createOrUpdateVariation({ payload, callback }, { call }) {
-      const response = yield call(postVariation, payload);
-      if (callback) callback(response.data);
+    *updateProduct({ payload, callback }, { call }) {
+      const response = yield call(updateProduct, payload);
+      if (callback) callback(response?.data);
     },
-    *updateProductActiveStatus({ payload, callback }, { call }) {
-      const response = yield call(updateProductStatus, payload);
-      if (callback) callback(response);
-    },
-    *fetchVariation({ payload }, { call,put }) {
+    *fetchVariation({ payload }, { call, put }) {
       const response = yield call(fetchVariation, payload);
       yield put({
         type: 'variationInfo',
-        payload: typeof response === 'object' ? response.data : undefined,
+        payload: typeof response === 'object' ? response.data : {},
       });
     },
     *fetchProductVariations({ payload }, { call, put }) {
@@ -84,40 +69,33 @@ const BrandsModal: ModelType = {
       const response = yield call(getProduct, payload);
       yield put({
         type: 'productInfo',
-        payload: typeof response === 'object' ? response.data : undefined,
+        payload: typeof response === 'object' ? response.data : {},
       });
     },
-    *fetchBrands(_, { call, put }) {
-      const response = yield call(getAllBrands);
+    *fetchProductFullInfo({ payload }, { call, put }) {
+      const response = yield call(fetchProductFullInfo, payload);
       yield put({
-        type: 'brandList',
-        payload: Array.isArray(response) ? response : [],
+        type: 'productInfo',
+        payload: typeof response === 'object' ? response.data : {},
       });
     },
-    *fetchSuppliers(_, { call, put }) {
-      const response = yield call(getAllSuppliers);
-      yield put({
-        type: 'suppliers',
-        payload: Array.isArray(response) ? response : [],
-      });
+
+    *createVariations({ payload, callback }, { call }) {
+      const response = yield call(createVariations, payload);
+      if (callback) callback(response.data);
     },
-    *fetchAttributes(_, { call, put }) {
-      const response = yield call(getAllAttributes);
-      yield put({
-        type: 'attributeList',
-        payload: Array.isArray(response) ? response : [],
-      });
-    },
-    *fetchCategories(_, { call, put }) {
-      const response = yield call(getAllcategories);
-      yield put({
-        type: 'categoriesList',
-        payload: Array.isArray(response) ? response : [],
-      });
-    },
-    *fetchSubcategores({ payload, callback }, { call }) {
-      const response = yield call(getSubCategories, payload);
+
+    *toggleProductActiveStatus({ payload, callback }, { call }) {
+      const response = yield call(toggleProductActiveStatus, payload);
       if (callback) callback(response);
+    },
+    *toggleVariationActiveStatus({ payload, callback }, { call }) {
+      const response = yield call(toggleVariationActiveStatus, payload);
+      if (callback) callback(response);
+    },
+    *bulkDelete({ payload, callback }, { call }) {
+      yield call(bulkDelete, payload);
+      if (callback) callback();
     },
   },
 
@@ -134,35 +112,10 @@ const BrandsModal: ModelType = {
         variation: action.payload,
       };
     },
-
-    brandList(state, action) {
-      return {
-        ...state,
-        brands: action.payload,
-      };
-    },
     productInfo(state, action) {
       return {
         ...state,
         product: action.payload,
-      };
-    },
-    categoriesList(state, action) {
-      return {
-        ...state,
-        categories: action.payload,
-      };
-    },
-    attributeList(state, action) {
-      return {
-        ...state,
-        attributes: action.payload,
-      };
-    },
-    suppliers(state, action) {
-      return {
-        ...state,
-        suppliers: action.payload,
       };
     },
   },
