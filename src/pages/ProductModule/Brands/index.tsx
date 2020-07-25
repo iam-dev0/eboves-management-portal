@@ -97,8 +97,8 @@ const TableList: React.FC<any> = (props) => {
       },
     },
     {
-      title: 'Popular',
-      dataIndex: 'popularity',
+      title: 'Featured',
+      dataIndex: 'featured',
       sorter: true,
       width: '10%',
       valueEnum: {

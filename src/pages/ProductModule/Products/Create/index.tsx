@@ -86,7 +86,9 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
           ...values,
           categoryId: values.categoryId[2],
           images: values.images?.filterImages(),
-          descriptionImage: values.descriptionImage?.filterImages(),
+          descriptionImage: Array.isArray(values.descriptionImage)
+            ? values.descriptionImage?.filterImages()
+            : undefined,
           metaKeywords: values.metaKeywords?.join(),
         },
         callback: (res) => {
@@ -103,7 +105,9 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
         id,
         categoryId: values.categoryId[2],
         images: values.images?.filterImages(),
-        descriptionImage: values.descriptionImage?.filterImages(),
+        descriptionImage: Array.isArray(values.descriptionImage)
+          ? values.descriptionImage?.filterImages()
+          : undefined,
         metaKeywords: values.metaKeywords?.join(),
       },
       callback: (res) => {
@@ -248,7 +252,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
                     <Select
                       mode="multiple"
                       placeholder="Select attributes"
-                      size='large'
+                      size="large"
                       // optionLabelProp="optionLable"
                       optionFilterProp="optionLable"
                     >

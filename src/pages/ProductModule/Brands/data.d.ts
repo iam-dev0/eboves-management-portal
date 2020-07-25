@@ -1,7 +1,7 @@
 export interface BrandItem {
   id: number;
   name: string;
-  popularity: boolean;
+  featured: boolean;
   active: boolean;
   createdAt: Date;
   logo?: string;
