@@ -32,6 +32,7 @@ ol {
   list-style: none;
 }
 
+//......................Custom .....................//
 .ant-layout-sider {
   background: @SidebarColor  !important;
 
@@ -86,7 +87,34 @@ ol {
   }
 }
 
+.Dragable-list {
 
+  .error {
+    border: 1px solid red;
+  }
+}
+
+.row-dragging {
+  background: #fafafa;
+  border: 1px solid #ccc;
+}
+
+.row-dragging td {
+  padding: 16px;
+  visibility: hidden;
+}
+
+.row-dragging .drag-visible {
+  visibility: visible;
+}
+
+.Dragable-list-action {
+  span {
+    padding: 0px 7px 0px 7px;
+  }
+}
+
+//......................Custom .....................//
 @media (max-width: @screen-xs) {
   .ant-table {
     width: 100%;

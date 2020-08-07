@@ -198,6 +198,20 @@ export default [
             ],
           },
           {
+            path: '/stock-control-module',
+            name: 'Stock Control',
+            icon: 'smile',
+            hideChildren: true,
+            routes: [
+              {
+                path: '/stock-control-module',
+                name: 'ConList',
+                icon: 'smile',
+                component: './StockControl',
+              },
+            ],
+          },
+          {
             name: 'list.table-list',
             icon: 'table',
             path: '/list',

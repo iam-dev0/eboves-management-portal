@@ -236,14 +236,14 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
                 <Col lg={24} md={24} sm={24}>
                   <Form.Item label="Images">
                     <Form.Item name="images" noStyle>
-                      <UploadImages request={upload} wall />
+                      <UploadImages request={upload} type="wall-list" />
                     </Form.Item>
                   </Form.Item>
                 </Col>
                 <Col lg={24} md={24} sm={24}>
                   <Form.Item label="Description Image">
                     <Form.Item name="descriptionImage" noStyle>
-                      <UploadImages request={upload} wall />
+                      <UploadImages request={upload} />
                     </Form.Item>
                   </Form.Item>
                 </Col>

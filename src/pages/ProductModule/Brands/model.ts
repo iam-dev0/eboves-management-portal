@@ -1,7 +1,7 @@
 import { Effect, Reducer } from 'umi';
 import {
   toggleActiveStatus,
-  togglePopularStatus,
+  toggleFeaturedStatus,
   bulkDelete,
   create,
   update,
@@ -22,7 +22,7 @@ export interface ModelType {
     fetch: Effect;
     fetchBrands: Effect;
     toggleActiveStatus: Effect;
-    togglePopularStatus: Effect;
+    toggleFeaturedStatus: Effect;
     bulkDelete: Effect;
     create: Effect;
     update: Effect;
@@ -53,8 +53,8 @@ const BrandsModal: ModelType = {
         payload: Array.isArray(res?.data) ? res.data : [],
       });
     },
-    *togglePopularStatus({ payload }, { call }) {
-      yield call(togglePopularStatus, payload);
+    *toggleFeaturedStatus({ payload }, { call }) {
+      yield call(toggleFeaturedStatus, payload);
     },
     *bulkDelete({ payload, callback }, { call }) {
       yield call(bulkDelete, payload);

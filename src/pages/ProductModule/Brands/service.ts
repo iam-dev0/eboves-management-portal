@@ -12,9 +12,9 @@ export async function toggleActiveStatus(id: number) {
   return request(`http://localhost:4040/brands/toggle-active/${id}`, option);
 }
 
-export async function togglePopularStatus(id: number) {
+export async function toggleFeaturedStatus(id: number) {
   const option = { method: 'PUT' };
-  return request(`http://localhost:4040/brands/toggle-populary/${id}`, option);
+  return request(`http://localhost:4040/brands/toggle-featured/${id}`, option);
 }
 
 export async function bulkDelete(ids: number[]) {
