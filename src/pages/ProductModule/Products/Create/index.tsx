@@ -56,10 +56,15 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
       const values = {
         ...product,
         categoryId: path,
-        images: product.images?.map((image: any) => ({
-          uid: image.id,
-          url: image.image,
-        })),
+        images: product.mainImage
+          ? [
+              { uid: 1, url: product.mainImage },
+              ...product.images?.map((image: any) => ({
+                uid: image.id,
+                url: image.image,
+              })),
+            ]
+          : [],
         attributes: product.attributes?.map((attribute: any) => attribute.id),
         descriptionImage: !product.descriptionImage || [{ uid: 1, url: product.descriptionImage }],
         metaKeywords: product.metaKeywords?.split(','),
@@ -75,7 +80,9 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
     dispatch({ type: 'brands/fetchBrands' });
     dispatch({ type: 'attributes/fetchAttributes' });
     dispatch({ type: 'categories/fetchCategories' });
-    return () => form.resetFields();
+    return () => {
+      dispatch({ type: 'products/reset' });
+      form.resetFields();}
   }, []);
 
   const onFinish = (values: any) => {
@@ -229,7 +236,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
                   </FormItem>
                 </Col>
                 <Col lg={24} md={24} sm={24}>
-                  <FormItem name="howToUse" label="How To Use">
+                  <FormItem name="additionalInformation" label="Additional Infromation">
                     <TextArea rows={4} placeholder="Enter.." />
                   </FormItem>
                 </Col>

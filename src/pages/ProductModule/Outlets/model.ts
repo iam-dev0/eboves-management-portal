@@ -6,10 +6,13 @@ import {
   updateOutlet,
   fetchCountries,
   fetchUsers,
+  fetchOutlets,
 } from './service';
+import { OutletItem } from './data';
 
 export interface StateType {
-  Countries: any[];
+  Countries?: any[];
+  outlets?: OutletItem[];
 }
 
 export interface ModelType {
@@ -22,9 +25,11 @@ export interface ModelType {
     update: Effect;
     fetchUsers: Effect;
     fetchCountries: Effect;
+    fetchOutlets: Effect;
   };
   reducers: {
     putCountries: Reducer<StateType>;
+    putOutlets: Reducer<StateType>;
   };
 }
 
@@ -33,6 +38,7 @@ const BrandsModal: ModelType = {
 
   state: {
     Countries: [],
+    outlets: [],
   },
 
   effects: {
@@ -62,6 +68,13 @@ const BrandsModal: ModelType = {
         payload: Array.isArray(res?.data) ? res?.data : [],
       });
     },
+    *fetchOutlets({ payload }, { call, put }) {
+      const res = yield call(fetchOutlets, payload);
+      yield put({
+        type: 'putOutlets',
+        payload: Array.isArray(res?.data) ? res?.data : [],
+      });
+    },
   },
   reducers: {
     putCountries(state, action) {
@@ -71,13 +84,19 @@ const BrandsModal: ModelType = {
           label: country.name,
           ...country,
           children: country.cities?.map((city: any) => {
-            return { value: city.id, label: city.name,...city };
+            return { value: city.id, label: city.name, ...city };
           }),
         };
       });
       return {
         ...state,
         Countries: structure,
+      };
+    },
+    putOutlets(state, action) {
+      return {
+        ...state,
+        outlets: action.payload,
       };
     },
   },

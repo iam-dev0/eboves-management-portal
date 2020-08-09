@@ -30,7 +30,7 @@ const ProductView: React.FC<any> = ({
     active,
     images,
     description,
-    howToUse,
+    additionalInformation,
   },
 }: any) => {
   const photos = images
@@ -77,8 +77,8 @@ const ProductView: React.FC<any> = ({
         <Tabs.TabPane tab="Description" key="2">
           <div>{description}</div>
         </Tabs.TabPane>
-        <Tabs.TabPane tab="How to use" key="3">
-          <div>{howToUse}</div>
+        <Tabs.TabPane tab="Additional Information" key="3">
+          <div>{additionalInformation}</div>
         </Tabs.TabPane>
       </Tabs>
     </Card>

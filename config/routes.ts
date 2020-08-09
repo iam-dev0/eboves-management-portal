@@ -209,6 +209,12 @@ export default [
                 icon: 'smile',
                 component: './StockControl',
               },
+              {
+                path: '/stock-control-module/purchase-order/add',
+                name: 'New Stock Order',
+                icon: 'smile',
+                component: './StockControl/Create/StockOrder',
+              },
             ],
           },
           {

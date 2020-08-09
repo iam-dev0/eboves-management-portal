@@ -11,12 +11,13 @@ export interface ProductItem {
   sku?: string;
   images?:any[];
   stockAvailableAt?:string;
+  mainImage?:string;
   productCode?:string;
   productType?: string;
   active: boolean;
   description?:string;
   descriptionImage?:string;
-  howToUse?:string;
+  additionalInformation?:string;
   commentsCount?:number;
   variations?:any[];
   rating?:number;

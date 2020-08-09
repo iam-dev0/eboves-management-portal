@@ -22,16 +22,17 @@ export interface ModelType {
     toggleProductActiveStatus: Effect;
     fetchProductVariations: Effect;
     fetchVariation: Effect;
-    updateProduct:Effect;
+    updateProduct: Effect;
     fetchProduct: Effect;
     fetchProductFullInfo: Effect;
-    bulkDelete:Effect;
-    toggleVariationActiveStatus:Effect;
+    bulkDelete: Effect;
+    toggleVariationActiveStatus: Effect;
   };
   reducers?: {
     productInfo: Reducer<StateType>;
     putVaritionList: Reducer<StateType>;
     variationInfo: Reducer<StateType>;
+    reset: Reducer<StateType>;
   };
 }
 
@@ -116,6 +117,13 @@ const BrandsModal: ModelType = {
       return {
         ...state,
         product: action.payload,
+      };
+    },
+    reset() {
+      return {
+        product: {},
+        variationsList: [],
+        variation: {},
       };
     },
   },

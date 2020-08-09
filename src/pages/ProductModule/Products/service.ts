@@ -68,6 +68,14 @@ export async function fetchProducts(params?: TableListParams) {
   });
 }
 
+
+export async function searchVairations(params?: any) {
+  return request('http://localhost:4040/products/search/variations', {
+    params,
+  });
+}
+
+
 export async function upload({ data, file, filename, onError, onSuccess }: any) {
   // EXAMPLE: post form-data with 'axios'
   // eslint-disable-next-line no-undef
@@ -77,13 +85,14 @@ export async function upload({ data, file, filename, onError, onSuccess }: any) 
       formData.append(key, data[key]);
     });
   }
+  formData.append('folder', 'products/shades/');
   formData.append(filename, file);
 
   const option = {
     method: 'POST',
     data: formData,
   };
-  await request(`http://localhost:4040/brands/upload`, option)
+  await request(`http://localhost:4040/upload`, option)
     .then(({ data: response }) => {
       if (!response) {
         onError(new Error('error while uploading try again'));

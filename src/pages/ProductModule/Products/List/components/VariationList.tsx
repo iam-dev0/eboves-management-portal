@@ -25,7 +25,11 @@ const NestedTable: React.FC<any> = (props) => {
 
   const columns = [
     { title: 'Product', dataIndex: 'name', width: '20%', className: 'NestFirtColum' },
-    { title: 'Product Type', width: '10%', render: () => product.productType },
+    {
+      title: 'Product Type',
+      width: '10%',
+      render: () => product.productType.charAt(0).toUpperCase() + product.productType.slice(1),
+    },
     { title: 'Sku', dataIndex: 'sku', width: '15%' },
     {
       title: 'Price',
@@ -52,7 +56,7 @@ const NestedTable: React.FC<any> = (props) => {
     {
       title: 'Action',
       key: 'operation',
-      render: (_, record:any) => (
+      render: (_, record: any) => (
         <span className="table-operation">
           <Link to={`/product-module/products/${product.id}/${record.id}`}>View</Link> |&nbsp;
           <Dropdown

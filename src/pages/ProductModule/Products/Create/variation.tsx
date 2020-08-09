@@ -13,12 +13,13 @@ import {
   InputNumber,
 } from 'antd';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import { connect,history } from 'umi';
-import {capitalizeFirstLetter } from '@/utils/utils';
+import { connect, history } from 'umi';
+import { capitalizeFirstLetter } from '@/utils/utils';
 import { PageHeaderWrapper, RouteContext } from '@ant-design/pro-layout';
 import UploadImages from '@/components/UploadImages';
 import dayjs from 'dayjs';
 import styles from './style.less';
+import { upload } from '../service';
 
 const FormItem = Form.Item;
 
@@ -202,39 +203,43 @@ const CreateVariationForm: React.FC<any> = (props) => {
       case 'image':
         return (
           <>
-            <Col lg={8} md={4} sm={4}>
-              <Form.Item
-                label={capitalizeFirstLetter(attribute.name)}
-                name={[index, 'value']}
-                // fieldKey={[attribute.id, 'attribute']}
-              >
-                <UploadImages showUploadButton />
-              </Form.Item>
-            </Col>
-            <Col lg={6} md={2} sm={4}>
-              <Form.Item
-                label="Alt"
-                name={[index, 'alt']}
-                // fieldKey={[attribute.id, 'attribute']}
-                rules={[{ required: true, message: 'Missing' }]}
-              >
-                <Input placeholder="enter alter value" width="20px" />
-              </Form.Item>
-            </Col>
+            <Row gutter={12}>
+              <Col lg={8} md={8} sm={8} >
+                <Form.Item
+                  label={capitalizeFirstLetter(attribute.name)}
+                  name={[index, 'value']}
+                  // fieldKey={[attribute.id, 'attribute']}
+                >
+                  <UploadImages type="button" />
+                </Form.Item>
+              </Col>
+              <Col lg={16} md={16} sm={16} >
+                <Form.Item
+                  label="Alt"
+                  name={[index, 'alt']}
+                  // fieldKey={[attribute.id, 'attribute']}
+                  rules={[{ required: true, message: 'Missing' }]}
+                >
+                  <Input placeholder="enter alter value" style={{width:'200px'}} />
+                </Form.Item>
+              </Col>
+            </Row>
           </>
         );
       default:
         return (
-          <Col lg={18} md={18} sm={18}>
-            <Form.Item
-              label={capitalizeFirstLetter(attribute.name)}
-              name={[index, 'value']}
-              // fieldKey={[attribute.id, 'attribute']}
-              rules={[{ required: true, message: 'Missing Price' }]}
-            >
-              <Input placeholder="enter here" />
-            </Form.Item>
-          </Col>
+          <Row gutter={12}>
+            <Col lg={18} md={18} sm={18}>
+              <Form.Item
+                label={capitalizeFirstLetter(attribute.name)}
+                name={[index, 'value']}
+                // fieldKey={[attribute.id, 'attribute']}
+                rules={[{ required: true, message: 'Missing Price' }]}
+              >
+                <Input placeholder="enter here" />
+              </Form.Item>
+            </Col>
+          </Row>
         );
     }
   };
@@ -242,11 +247,9 @@ const CreateVariationForm: React.FC<any> = (props) => {
     return (
       <div>
         <Divider orientation="left">Attributes</Divider>
-        <Row gutter={12}>
-          {product?.attributes?.map((attribute: any, index: number) =>
-            AttributeItem(attribute, index),
-          )}
-        </Row>
+        {product?.attributes?.map((attribute: any, index: number) =>
+          AttributeItem(attribute, index),
+        )}
       </div>
     );
   };
@@ -296,7 +299,7 @@ const CreateVariationForm: React.FC<any> = (props) => {
             <Row gutter={16}>
               <Col lg={24} md={24} sm={24}>
                 <FormItem name={[field.name, 'images']} label="Images">
-                  <UploadImages wall />
+                  <UploadImages type="wall-list" request={upload} />
                 </FormItem>
               </Col>
             </Row>
