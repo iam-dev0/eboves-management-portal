@@ -49,11 +49,11 @@ const EditableCell: React.FC<EditableCellProps> = ({
   const [supplierPrice, setSupplierPrice] = useState<any>(0);
 
   const save = (e) => {
-    handleSave({ ...record, [dataIndex]: e.target.value });
+    handleSave({ ...record, [dataIndex]: e.target.value || record[dataIndex] });
   };
 
   const saveSupplier = () => {
-    handleSave({ ...record, [dataIndex]: supplierPrice });
+    handleSave({ ...record, [dataIndex]: supplierPrice || record[dataIndex] });
   };
 
   let childNode = children;
@@ -121,11 +121,11 @@ const EditableCell: React.FC<EditableCellProps> = ({
   return <td {...restProps}>{childNode}</td>;
 };
 
-const EditableTableFooter: React.FC<any> = ({ handleAdd }) => {
+const EditableTableFooter: React.FC<any> = ({ handleAdd, outlet }) => {
   const [options, setOptions] = useState<any[]>([]);
   const [value, setValue] = useState<string>('');
   const onSeachHandler = async (value: string) => {
-    const vars = await searchVairations({ name: value, pageSize: 4 });
+    const vars = await searchVairations({ name: value, pageSize: 4, outlet: outlet?.id });
     const items: any[] = [];
 
     // eslint-disable-next-line no-unused-expressions
@@ -182,12 +182,12 @@ const EditableTableFooter: React.FC<any> = ({ handleAdd }) => {
   );
 };
 
-const EditableTable: React.FC<any> = ({ outletName }) => {
+const EditableTable: React.FC<any> = ({ outlet }) => {
   const [dataSource, setdataSource] = useState<any>([
     {
       id: '0',
       name: 'm3sK x8 QFTyX7 TPVS Z9MG',
-      currentQuantity: '32',
+      availableQuantity: '32',
       sku: '3938-388',
       quantity: '3',
       supplierPrice: '120',
@@ -201,17 +201,13 @@ const EditableTable: React.FC<any> = ({ outletName }) => {
 
   const handleAdd = (newData: any) => {
     const exist = dataSource.findIndex((d: any) => d.id === newData.id);
-    if (exist === -1) setdataSource([...dataSource, newData]);
+    if (exist === -1) setdataSource([...dataSource, { quantity: 1, ...newData }]);
   };
 
   const handleSave = (row: any) => {
     const newData = [...dataSource];
-    const index = newData.findIndex((item) => row.key === item.key);
-    const item = newData[index];
-    newData.splice(index, 1, {
-      ...item,
-      ...row,
-    });
+    const index = newData.findIndex((item) => row.id === item.id);
+    if (index !== -1) newData[index] = row;
     setdataSource(newData);
   };
 
@@ -233,10 +229,10 @@ const EditableTable: React.FC<any> = ({ outletName }) => {
       title: () => (
         <div>
           <div>Current Inventory </div>
-          <small style={{ fontWeight: 'normal' }}>{outletName}</small>
+          <small style={{ fontWeight: 'normal' }}>{outlet?.name || 'all outlets'}</small>
         </div>
       ),
-      dataIndex: 'currentQuantity',
+      dataIndex: 'availableQuantity',
       width: '100px',
     },
     {
@@ -304,7 +300,7 @@ const EditableTable: React.FC<any> = ({ outletName }) => {
         size="small"
         rowClassName={() => 'editable-row'}
         bordered
-        footer={() => <EditableTableFooter handleAdd={handleAdd} />}
+        footer={() => <EditableTableFooter handleAdd={handleAdd} outlet={outlet} />}
         dataSource={dataSource}
         columns={newcolumns}
         pagination={false}

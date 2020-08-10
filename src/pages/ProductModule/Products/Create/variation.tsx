@@ -157,21 +157,6 @@ const CreateVariationForm: React.FC<any> = (props) => {
                 <Input placeholder="barcode" />
               </Form.Item>
             </Col>
-            <Col lg={8} md={10} sm={10}>
-              <Form.Item
-                {...field}
-                label="Supplier Price"
-                name={[field.name, 'supplierPrice']}
-                fieldKey={[field.key, 'price']}
-                rules={[{ required: true, message: 'Missing Price' }]}
-              >
-                <InputNumber
-                  defaultValue={0}
-                  formatter={(value) => `Rs. ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                  parser={(value = '0') => value.replace(/Rs.\s?|(,*)/g, '')}
-                />
-              </Form.Item>
-            </Col>
             <Col lg={2} md={2} sm={2}>
               <MinusCircleOutlined
                 style={{ marginTop: '40px' }}
@@ -204,7 +189,7 @@ const CreateVariationForm: React.FC<any> = (props) => {
         return (
           <>
             <Row gutter={12}>
-              <Col lg={8} md={8} sm={8} >
+              <Col lg={8} md={8} sm={8}>
                 <Form.Item
                   label={capitalizeFirstLetter(attribute.name)}
                   name={[index, 'value']}
@@ -213,14 +198,14 @@ const CreateVariationForm: React.FC<any> = (props) => {
                   <UploadImages type="button" />
                 </Form.Item>
               </Col>
-              <Col lg={16} md={16} sm={16} >
+              <Col lg={16} md={16} sm={16}>
                 <Form.Item
                   label="Alt"
                   name={[index, 'alt']}
                   // fieldKey={[attribute.id, 'attribute']}
                   rules={[{ required: true, message: 'Missing' }]}
                 >
-                  <Input placeholder="enter alter value" style={{width:'200px'}} />
+                  <Input placeholder="enter alter value" style={{ width: '200px' }} />
                 </Form.Item>
               </Col>
             </Row>
@@ -266,7 +251,7 @@ const CreateVariationForm: React.FC<any> = (props) => {
             extra={cardHeaderButtons(remove, field.name, fields.length > 1)}
           >
             <Row gutter={16}>
-              <Col lg={14} md={14} sm={24}>
+              <Col lg={8} md={8} sm={24}>
                 <FormItem
                   name={[field.name, 'sku']}
                   label="SKU"
@@ -275,14 +260,29 @@ const CreateVariationForm: React.FC<any> = (props) => {
                   <Input placeholder="Enter." />
                 </FormItem>
               </Col>
-              <Col lg={10} md={10} sm={24}>
+              <Col lg={8} md={8} sm={24}>
                 <FormItem
                   name={[field.name, 'price']}
                   label="Retail Price"
                   rules={[{ required: true, message: 'price is required' }]}
+                  initialValue={0}
                 >
                   <InputNumber
-                    defaultValue={0}
+                    style={{ width: '100%' }}
+                    formatter={(value) => `Rs. ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                    parser={(value = '0') => value.replace(/Rs.\s?|(,*)/g, '')}
+                  />
+                </FormItem>
+              </Col>
+              <Col lg={8} md={8} sm={8}>
+                <FormItem
+                  name={[field.name, 'supplierPrice']}
+                  label="Supplier Price"
+                  rules={[{ required: true, message: 'price is required' }]}
+                  initialValue={0}
+                >
+                  <InputNumber
+                    style={{ width: '100%' }}
                     formatter={(value) => `Rs. ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                     parser={(value = '0') => value.replace(/Rs.\s?|(,*)/g, '')}
                   />

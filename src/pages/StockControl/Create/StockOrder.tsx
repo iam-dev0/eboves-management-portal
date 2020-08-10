@@ -147,6 +147,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
                         rules={[{ required: true, message: 'Choose an Outlet' }]}
                       >
                         <Select
+                          allowClear
                           placeholder="Choose a Outlet"
                           optionFilterProp="optionLable"
                           defaultValue={1}
@@ -228,7 +229,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
                   </p>
                 </Col>
                 <Col lg={18} md={18} sm={28}>
-                  <EditableTable outletName={outlet?.name} />
+                  <EditableTable outlet={outlet} />
                 </Col>
               </Row>
             </Form>

@@ -18,6 +18,8 @@ const VariationView: React.FC<any> = ({
     active,
     shortDescription,
     attributeValues,
+    mainBarcode,
+    supplierPrice,
     barcodes,
     images,
   },
@@ -35,7 +37,9 @@ const VariationView: React.FC<any> = ({
         <Descriptions size={size}>
           <Descriptions.Item label="Slug">{slug}</Descriptions.Item>
           <Descriptions.Item label="Sku">{sku}</Descriptions.Item>
-          <Descriptions.Item label="Price">{price}</Descriptions.Item>
+          <Descriptions.Item label="Barcode">{mainBarcode}</Descriptions.Item>
+          <Descriptions.Item label="Retail Price">{price}</Descriptions.Item>
+          <Descriptions.Item label="Supplier Price">{supplierPrice}</Descriptions.Item>
           <Descriptions.Item label="Status">
             {active ? (
               <Badge status="success" text="Active" />
@@ -64,16 +68,11 @@ const VariationView: React.FC<any> = ({
       </div>
       <Tabs tabPosition={tabPosition} className={styles.productTabs}>
         <Tabs.TabPane tab="More Information" key="1">
-          {barcodes?.map(
-            ({ supplierPrice, barcode }: { supplierPrice: number; barcode: string }) => (
-              <Descriptions size={size} bordered>
-                <Descriptions.Item label="Bracode">{barcode}</Descriptions.Item>
-                <Descriptions.Item label="Supplier Price" span={2}>
-                  {supplierPrice}
-                </Descriptions.Item>
-              </Descriptions>
-            ),
-          )}
+          {barcodes?.map(({ barcode }: { supplierPrice: number; barcode: string }) => (
+            <Descriptions size={size} bordered>
+              <Descriptions.Item label="Bracode">{barcode}</Descriptions.Item>
+            </Descriptions>
+          ))}
 
           <Descriptions bordered size={size}>
             <Descriptions.Item label="Description" span={3}>
