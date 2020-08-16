@@ -210,6 +210,12 @@ export default [
                 component: './StockControl',
               },
               {
+                path: '/stock-control-module/stock-movement/:id',
+                name: 'New Stock Order',
+                icon: 'smile',
+                component: './StockControl/View',
+              },
+              {
                 path: '/stock-control-module/purchase-order/add',
                 name: 'New Stock Order',
                 icon: 'smile',

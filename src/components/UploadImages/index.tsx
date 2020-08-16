@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Upload, notification, Button } from 'antd';
-import { PlusOutlined, InboxOutlined, UploadOutlined } from '@ant-design/icons';
+import { InboxOutlined, UploadOutlined } from '@ant-design/icons';
 import UploadList from './UploadList';
 
 const { Dragger } = Upload;

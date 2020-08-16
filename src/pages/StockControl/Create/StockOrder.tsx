@@ -63,13 +63,13 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
     //   });
     //   return;
     // }
-    // dispatch({
-    //   type: 'suppliers/update',
-    //   payload: { id, ...values },
-    //   callback: () => {
-    //     history.push(`/procurement-module/suppliers`);
-    //   },
-    // });
+    dispatch({
+      type: 'stock/PostStockRequest',
+      payload: values,
+      // callback: () => {
+      //   history.push(`/procurement-module/suppliers`);
+      // },
+    });
   };
 
   const onFinishFailed = (error: any) => {
@@ -84,7 +84,9 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
     <RouteContext.Consumer>
       {() => (
         <>
-          <Button type="primary">Save</Button>
+          <Button type="primary" onClick={form.submit}>
+            Save
+          </Button>
           <Button style={{ margin: '0px 5px 0px 5px' }}>Cancel</Button>
         </>
       )}
@@ -169,7 +171,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
                       </Form.Item>
                     </Col>
                     <Col lg={12} md={12} sm={12}>
-                      <Form.Item name="deliverDate" label="Delivery Date">
+                      <Form.Item name="delieveryDate" label="Delivery Date">
                         <DatePicker style={{ width: '100%' }} placeholder="Choose Date" />
                       </Form.Item>
                     </Col>
@@ -229,7 +231,9 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
                   </p>
                 </Col>
                 <Col lg={18} md={18} sm={28}>
-                  <EditableTable outlet={outlet} />
+                  <Form.Item name="variations">
+                    <EditableTable outlet={outlet} />
+                  </Form.Item>
                 </Col>
               </Row>
             </Form>

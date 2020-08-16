@@ -1,80 +1,45 @@
 import { Effect, Reducer } from 'umi';
-import { getAllSuppliers,fetchSupplier, toggleActiveStatus, bulkDelete, create, update } from './service';
+import { PostStockRequest, getStockOrder } from './service';
 
-export interface StateType {}
+export interface StateType {
+  stockOrder?: any;
+}
 export interface ModelType {
   namespace: string;
   state?: StateType;
   effects: {
-    fetchSuppliers: Effect;
-    create: Effect;
-    fetchSupplier: Effect;
-    toggleActiveStatus: Effect;
-    bulkDelete: Effect;
-    update: Effect;
+    PostStockRequest: Effect;
+    fetchOrder: Effect;
   };
   reducers?: {
-    suppliers: Reducer<StateType>;
-    putSupplier: Reducer<StateType>;
-    resetStates: Reducer<StateType>;
+    putStockOrder: Reducer<StateType>;
   };
 }
 
 const BrandsModal: ModelType = {
-  namespace: 'stockcontroll',
+  namespace: 'stock',
   state: {
-    suppliers: [],
-    supplier: {},
+    stockOrder: {},
   },
   effects: {
-    *fetchSupplier({ payload }, { call, put }) {
-      const res = yield call(fetchSupplier, payload);
-      yield put({
-        type: 'putSupplier',
-        payload: res?.data ? res.data : {},
-      });
-    },
-    *fetchSuppliers(_, { call, put }) {
-      const response = yield call(getAllSuppliers);
-      yield put({
-        type: 'suppliers',
-        payload: Array.isArray(response?.data) ? response?.data : [],
-      });
-    },
-    *toggleActiveStatus({ payload }, { call }) {
-      yield call(toggleActiveStatus, payload);
-    },
-    *bulkDelete({ payload, callback }, { call }) {
-      yield call(bulkDelete, payload);
+    *PostStockRequest({ payload, callback }, { call, put }) {
+      yield call(PostStockRequest, payload);
       if (callback) callback();
     },
-    *create({ payload, callback }, { call }) {
-      const res = yield call(create, payload);
-      if (callback && res?.data?.id) callback();
-    },
-    *update({ payload, callback }, { call }) {
-      const res = yield call(update, payload);
-      if (callback && res?.data) callback();
+    *fetchOrder({ payload }, { call, put }) {
+      const response = yield call(getStockOrder, payload);
+      yield put({
+        type: 'putStockOrder',
+        payload: typeof response === 'object' ? response.data : {},
+      });
     },
   },
 
   reducers: {
-    suppliers(state, action) {
+    putStockOrder(state, action) {
       return {
         ...state,
-        suppliers: action.payload,
-      };
-    },
-    putSupplier(state, action) {
-      return {
-        ...state,
-        supplier: action.payload,
-      };
-    },
-    resetStates() {
-      return {
-        brand: undefined,
-        brands: [],
+        stockOrder: action.payload,
       };
     },
   },

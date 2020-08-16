@@ -6,7 +6,7 @@ import { PageHeaderWrapper, RouteContext } from '@ant-design/pro-layout';
 import ProTable, { ProColumns, ActionType, IntlProvider, enUSIntl } from '@ant-design/pro-table';
 import { SorterResult } from 'antd/es/table/interface';
 import styles from './index.less';
-import { getAllSuppliers as fetchSuppliers } from './service';
+import { getAllSuppliers as fetchSuppliers } from '../ProcurementModule/Suppliers/index';
 import { SupplierItem } from './data';
 import SupplierView from './View';
 

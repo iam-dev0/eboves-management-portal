@@ -21,7 +21,7 @@ yarn.lock
 package-lock.json
 *bak
 .vscode
-
+.env
 # visual studio code
 .history
 *.log

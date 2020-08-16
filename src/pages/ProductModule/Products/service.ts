@@ -1,12 +1,13 @@
 import request from '@/utils/request';
 import { TableListParams } from '@/pages/ListTableList/data';
 
+console.log('hel', process.env);
 export async function postProduct(data: any) {
   const option = {
     method: 'POST',
     data,
   };
-  return request('http://localhost:4040/products', option);
+  return request(`products`, option);
 }
 
 export async function updateProduct(data: any) {
@@ -14,7 +15,7 @@ export async function updateProduct(data: any) {
     method: 'PUT',
     data,
   };
-  return request(`http://localhost:4040/products/${data.id}`, option);
+  return request(`products/${data.id}`, option);
 }
 
 export async function createVariations(data: any) {
@@ -22,59 +23,54 @@ export async function createVariations(data: any) {
     method: 'POST',
     data: data.variations,
   };
-  return request(`http://localhost:4040/products/${data.productId}/variations`, option);
+  return request(`products/${data.productId}/variations`, option);
 }
 
 export async function fetchProductVariations(data: any) {
-  return request(`http://localhost:4040/products/${data.id}/variations`);
+  return request(`products/${data.id}/variations`);
 }
 
 export async function bulkDelete(ids: number[]) {
   const option = { method: 'DELETE', params: ids };
-  return request(`http://localhost:4040/products`, option);
+  return request(`products`, option);
 }
 
 export async function fetchVariation(params: any) {
-  return request(`http://localhost:4040/products/${params.pid}/variation/${params.vid}`);
+  return request(`products/${params.pid}/variation/${params.vid}`);
 }
 
 export async function getProduct(id: number) {
-  return request(`http://localhost:4040/products/${id}`);
+  return request(`products/${id}`);
 }
 
 export async function fetchProductFullInfo(id: number) {
-  return request(`http://localhost:4040/products/${id}/full`);
+  return request(`products/${id}/full`);
 }
 
 export async function toggleProductActiveStatus(params: any) {
   const option = {
     method: 'PUT',
   };
-  return request(`http://localhost:4040/products/${params}/status`, option);
+  return request(`products/${params}/status`, option);
 }
 export async function toggleVariationActiveStatus(params: any) {
   const option = {
     method: 'PUT',
   };
-  return request(
-    `http://localhost:4040/products/${params.pid}/variation/${params.vid}/status`,
-    option,
-  );
+  return request(`products/${params.pid}/variation/${params.vid}/status`, option);
 }
 
 export async function fetchProducts(params?: TableListParams) {
-  return request('http://localhost:4040/products', {
+  return request(`products`, {
     params,
   });
 }
-
 
 export async function searchVairations(params?: any) {
-  return request('http://localhost:4040/products/search/variations', {
+  return request(`products/search/variations`, {
     params,
   });
 }
-
 
 export async function upload({ data, file, filename, onError, onSuccess }: any) {
   // EXAMPLE: post form-data with 'axios'
@@ -92,7 +88,7 @@ export async function upload({ data, file, filename, onError, onSuccess }: any) 
     method: 'POST',
     data: formData,
   };
-  await request(`http://localhost:4040/upload`, option)
+  await request(`upload`, option)
     .then(({ data: response }) => {
       if (!response) {
         onError(new Error('error while uploading try again'));

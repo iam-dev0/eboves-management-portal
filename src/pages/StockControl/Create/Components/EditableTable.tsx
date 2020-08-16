@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Table, Input, Button, Popconfirm, Form, AutoComplete, InputNumber, Row, Col } from 'antd';
+import React, { useState, useEffect, useContext } from 'react';
+import { Table, Input, Popconfirm, Form, AutoComplete, InputNumber, Row, Col } from 'antd';
 import { SearchOutlined, DeleteOutlined } from '@ant-design/icons';
 import { searchVairations } from '@/pages/ProductModule/Products/service';
 import ScanSvg from '@/assets/svgs/scan.svg';
@@ -7,10 +7,13 @@ import ScanSvg from '@/assets/svgs/scan.svg';
 const EditableContext = React.createContext<any>();
 
 interface Item {
-  key: string;
+  id: number;
   name: string;
-  age: string;
-  address: string;
+  availableQuantity: number;
+  sku: string;
+  quantity: number;
+  supplierPrice: number;
+  totalCost: number;
 }
 
 interface EditableRowProps {
@@ -46,14 +49,11 @@ const EditableCell: React.FC<EditableCellProps> = ({
   handleSave,
   ...restProps
 }) => {
-  const [supplierPrice, setSupplierPrice] = useState<any>(0);
+  // const form = useContext(EditableContext);
+  // const [supplierPrice, setSupplierPrice] = useState<any>(0);
 
-  const save = (e) => {
-    handleSave({ ...record, [dataIndex]: e.target.value || record[dataIndex] });
-  };
-
-  const saveSupplier = () => {
-    handleSave({ ...record, [dataIndex]: supplierPrice || record[dataIndex] });
+  const save = (value: any) => {
+    handleSave({ ...record, [dataIndex]: value || record[dataIndex] });
   };
 
   let childNode = children;
@@ -63,7 +63,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
       return Promise.resolve();
     }
     // eslint-disable-next-line prefer-promise-reject-errors
-    return Promise.reject('Quantity must be greater than 0');
+    return Promise.reject('must be greater than 0');
   };
 
   if (editable) {
@@ -81,17 +81,11 @@ const EditableCell: React.FC<EditableCellProps> = ({
             ]}
           >
             <InputNumber
-              value={supplierPrice}
-              formatter={(value) => {
-                return `Rs. ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-              }}
-              parser={(value = '0') => {
-                // eslint-disable-next-line radix
-                return parseInt(value.replace(/Rs.\s?|(,*)/g, ''));
-              }}
+              formatter={(value) => `Rs. ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+              // eslint-disable-next-line radix
+              parser={(value = '0') => parseInt(value.replace(/Rs.\s?|(,*)/g, ''))}
               style={{ margin: 0, width: '120px', borderRadius: '0px' }}
-              onChange={(value) => setSupplierPrice(value)}
-              onBlur={saveSupplier}
+              onChange={save}
             />
           </Form.Item>
         );
@@ -101,16 +95,16 @@ const EditableCell: React.FC<EditableCellProps> = ({
           <Form.Item
             style={{ margin: 0 }}
             name={dataIndex}
+            initialValue={record[dataIndex]}
             rules={[
               {
                 validator: quantityValiation,
               },
             ]}
           >
-            <Input
+            <InputNumber
               min={1}
-              defaultValue={record[dataIndex]}
-              onBlur={save}
+              onChange={save}
               style={{ margin: 0, width: '120px', borderRadius: '0px' }}
             />
           </Form.Item>
@@ -124,6 +118,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
 const EditableTableFooter: React.FC<any> = ({ handleAdd, outlet }) => {
   const [options, setOptions] = useState<any[]>([]);
   const [value, setValue] = useState<string>('');
+  // eslint-disable-next-line no-shadow
   const onSeachHandler = async (value: string) => {
     const vars = await searchVairations({ name: value, pageSize: 4, outlet: outlet?.id });
     const items: any[] = [];
@@ -182,18 +177,26 @@ const EditableTableFooter: React.FC<any> = ({ handleAdd, outlet }) => {
   );
 };
 
-const EditableTable: React.FC<any> = ({ outlet }) => {
-  const [dataSource, setdataSource] = useState<any>([
+const EditableTable: React.FC<any> = ({ value = [], onChange, outlet }) => {
+  const [dataSource, setdataSource] = useState<Item[]>([
     {
-      id: '0',
+      id: 98,
       name: 'm3sK x8 QFTyX7 TPVS Z9MG',
-      availableQuantity: '32',
-      sku: '3938-388',
-      quantity: '3',
-      supplierPrice: '120',
-      totalCost: '3',
+      availableQuantity: 32,
+      sku: '44bfd537-a4e44e8',
+      quantity: 3,
+      supplierPrice: 120,
+      totalCost: 3,
     },
   ]);
+
+  useEffect(() => {
+    if (Array.isArray(value) && value.length > 0) setdataSource(value);
+  }, [value]);
+
+  useEffect(() => {
+    onChange(dataSource);
+  }, [dataSource]);
 
   const handleDelete = (key: number) => {
     setdataSource(dataSource.filter((item: any) => item.id !== key));
@@ -201,7 +204,9 @@ const EditableTable: React.FC<any> = ({ outlet }) => {
 
   const handleAdd = (newData: any) => {
     const exist = dataSource.findIndex((d: any) => d.id === newData.id);
-    if (exist === -1) setdataSource([...dataSource, { quantity: 1, ...newData }]);
+    if (exist === -1) {
+      setdataSource([...dataSource, { quantity: 1, ...newData }]);
+    }
   };
 
   const handleSave = (row: any) => {

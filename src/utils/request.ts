@@ -17,7 +17,7 @@ const codeMessage = {
   406: 'Not Acceptable',
   410: 'The request content is not longer available',
   422: 'The request was well-formed but was unable to be followed due to semantic errors.',
-  500: 'The server has encountered a situation it doesn\'t know how to handle',
+  500: "The server has encountered a situation it doesn't know how to handle",
   502: 'Bad Gateway',
   503: 'The server is not ready to handle the request',
   504: 'Timeout',
@@ -51,6 +51,8 @@ const errorHandler = (error: { response: Response }): Response => {
 const request = extend({
   errorHandler, // 默认错误处理
   // credentials: 'include', // 默认请求是否带上cookie
+  // eslint-disable-next-line no-undef
+  prefix: API_URL,
 });
 
 export default request;
