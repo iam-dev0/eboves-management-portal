@@ -2,39 +2,57 @@
 
 pipeline {
   agent any
-  stages {
-    stage('Prepare Workspace') {
-      steps {
-        sh 'yarn'
-      }
-    }
 
-    stage('build') {
-      steps {
-        sh 'yarn build'
-      }
-    }
+  // environment {
+  //       API_URL = 'http://172.104.186.220:4041/'
+  //   }
+  stages {
+    // stage('Prepare Workspace') {
+    //   steps {
+    //     script {
+    //           // Determine whether this is a test or a staging / production build                    
+    //           switch (BRANCH_NAME) {
+    //               case 'dev':
+    //                   API_URL = 'http://172.104.186.220:4041/'
+    //                   break
+    //               case 'master':
+    //                   API_URL = 'http://172.104.186.220:4040/'
+    //                   break
+    //               default: 
+    //                  API_URL = 'http://172.104.186.220:4041/'
+    //                   break
+    //             }
+    //       }
+    //     sh 'yarn'
+    //   }
+    // }
+
+    // stage('build') {
+    //   steps {
+    //     sh 'yarn build'
+    //   }
+    // }
 
     stage('deploy') {
       when {
         expression {
-          params.node_env == 'dev'
+          BRANCH_NAME == 'dev'
         }
 
       }
       steps {
         echo 'deploying'
         sh '''ssh cdjenkins@172.104.186.220 \'
-            rm -rf /var/www/StagingServer/BackOffice/*
-            \'
+              cd /var/www/StagingServer/BackOffice
+              git stash
+              git pull
+              yarn
+              yarn build
 
-            rsync -avz -e ssh dist/ cdjenkins@172.104.186.220:/var/www/StagingServer/BackOffice
+            \'
             '''
       }
     }
 
-  }
-  parameters {
-    choice(name: 'node_env', choices: ['dev', 'pro', 'stage'], description: 'Server envrinoment')
   }
 }
