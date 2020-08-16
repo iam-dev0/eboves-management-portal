@@ -24,8 +24,8 @@ export interface UserModelType {
   namespace: 'user';
   state: UserModelState;
   effects: {
-    fetch: Effect;
-    fetchCurrent: Effect;
+    // fetch: Effect;
+    // fetchCurrent: Effect;
   };
   reducers: {
     saveCurrentUser: Reducer<UserModelState>;
@@ -41,20 +41,20 @@ const UserModel: UserModelType = {
   },
 
   effects: {
-    *fetch(_, { call, put }) {
-      const response = yield call(queryUsers);
-      yield put({
-        type: 'save',
-        payload: response,
-      });
-    },
-    *fetchCurrent(_, { call, put }) {
-      const response = yield call(queryCurrent);
-      yield put({
-        type: 'saveCurrentUser',
-        payload: response,
-      });
-    },
+    // *fetch(_, { call, put }) {
+    //   const response = yield call(queryUsers);
+    //   yield put({
+    //     type: 'save',
+    //     payload: response,
+    //   });
+    // },
+    // *fetchCurrent(_, { call, put }) {
+    //   const response = yield call(queryCurrent);
+    //   yield put({
+    //     type: 'saveCurrentUser',
+    //     payload: response,
+    //   });
+    // },
   },
 
   reducers: {
