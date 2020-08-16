@@ -1,0 +1,40 @@
+
+
+pipeline {
+  agent any
+  stages {
+    stage('Prepare Workspace') {
+      steps {
+        sh 'yarn'
+      }
+    }
+
+    stage('build') {
+      steps {
+        sh 'yarn build'
+      }
+    }
+
+    stage('deploy') {
+      when {
+        expression {
+          params.node_env == 'dev'
+        }
+
+      }
+      steps {
+        echo 'deploying'
+        sh '''ssh cdjenkins@172.104.186.220 \'
+            rm -rf /var/www/StagingServer/BackOffice/*
+            \'
+
+            rsync -avz -e ssh dist/ cdjenkins@172.104.186.220:/var/www/StagingServer/BackOffice
+            '''
+      }
+    }
+
+  }
+  parameters {
+    choice(name: 'node_env', choices: ['dev', 'pro', 'stage'], description: 'Server envrinoment')
+  }
+}
