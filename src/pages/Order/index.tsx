@@ -32,24 +32,7 @@ const TableList: React.FC<any> = (props) => {
     });
   };
 
-  const action = (
-    <RouteContext.Consumer>
-      {() => (
-        <>
-          <Button.Group>
-            <Button type="primary">Order Stock</Button>
-            <Button type="primary" style={{ margin: '0px 5px 0px 5px' }}>
-              Receive Stock
-            </Button>
-            <Button type="primary" style={{ margin: '0px 5px 0px 5px' }}>
-              Stock Transfer
-            </Button>
-          </Button.Group>
-          <Button type="primary">Return Stock</Button>
-        </>
-      )}
-    </RouteContext.Consumer>
-  );
+ 
 
   const columns: ProColumns<any>[] = [
     {
@@ -101,7 +84,7 @@ const TableList: React.FC<any> = (props) => {
       // valueType:'option',
       valueEnum: {
         PENDING: {
-          text: 'Pending Order',
+          text: 'pending',
           status: 'Default',
         },
         CONFIRMED: {
@@ -128,7 +111,7 @@ const TableList: React.FC<any> = (props) => {
           text: 'Overdue orders',
           status: 'Error',
         },
-        CANCELLED: {
+        CANCELED: {
           text: 'cancelled',
           status: 'Error',
         },
@@ -158,7 +141,7 @@ const TableList: React.FC<any> = (props) => {
   ];
 
   return (
-    <PageHeaderWrapper extra={action}>
+    <PageHeaderWrapper>
       <View isOpen={!!openOrderModal} onClose={() => setOpenOrderModal(null)} id={openOrderModal} />
       <IntlProvider value={enUSIntl}>
         <ProTable<any>
