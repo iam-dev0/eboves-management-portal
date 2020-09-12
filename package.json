@@ -32,7 +32,7 @@
     "test:component": "umi test ./src/components",
     "tsc": "tsc"
   },
-  "husky": {
+  "husky-comment": {
     "hooks": {
       "pre-commit": "npm run lint-staged"
     }
@@ -50,6 +50,7 @@
   ],
   "dependencies": {
     "@ant-design/icons": "^4.0.0",
+    "@ant-design/pro-card": "^1.0.5",
     "@ant-design/pro-layout": "^5.0.8",
     "@ant-design/pro-table": "^2.4.1",
     "antd": "^4.4.3",
@@ -57,7 +58,6 @@
     "classnames": "^2.2.6",
     "dayjs": "^1.8.28",
     "lodash": "^4.17.11",
-    "moment": "^2.25.3",
     "omit.js": "^1.0.2",
     "path-to-regexp": "2.4.0",
     "qs": "^6.9.0",
