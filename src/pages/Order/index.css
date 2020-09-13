@@ -1,0 +1,24 @@
+.background {
+  background-color: #BCBCBC;
+  width: 100px;
+  height: 50px;
+  padding: 0;
+  margin: 0;
+}
+.line1 {
+  width: 112px;
+  height: 47px;
+  border-bottom: 1px solid red;
+  -webkit-transform: translateY(-20px) translateX(5px) rotate(27deg);
+  position: absolute;
+  /* top: -20px; */
+}
+.line2 {
+  width: 112px;
+  height: 47px;
+  border-bottom: 1px solid green;
+  -webkit-transform: translateY(20px) translateX(5px) rotate(-26deg);
+  position: absolute;
+  top: -33px;
+  left: -13px;
+}

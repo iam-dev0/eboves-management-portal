@@ -45,78 +45,71 @@ const Login: React.FC<LoginProps> = (props) => {
   return (
     <div className={styles.main}>
       <LoginForm activeKey={type} onTabChange={setType} onSubmit={handleSubmit}>
-        <Tab key="account" tab="账户密码登录">
-          {status === 'error' && loginType === 'account' && !submitting && (
-            <LoginMessage content="账户或密码错误（admin/ant.design）" />
+        <Tab key="account" tab="Basic">
+          {status === 'error' && !submitting && (
+            <LoginMessage content="invalid username or credential" />
           )}
 
           <UserName
             name="userName"
-            placeholder="用户名: admin or user"
+            placeholder="email or username"
             rules={[
               {
                 required: true,
-                message: '请输入用户名!',
+                message: 'feild is required!',
               },
             ]}
           />
           <Password
             name="password"
-            placeholder="密码: ant.design"
+            placeholder="password"
             rules={[
               {
                 required: true,
-                message: '请输入密码！',
+                message: 'feild is required!',
               },
             ]}
           />
         </Tab>
-        <Tab key="mobile" tab="手机号登录">
+        {/* <Tab key="mobile" tab="Mobile">
           {status === 'error' && loginType === 'mobile' && !submitting && (
-            <LoginMessage content="验证码错误" />
+            <LoginMessage content="invalid username or credential" />
           )}
           <Mobile
             name="mobile"
-            placeholder="手机号"
+            placeholder="phone no"
             rules={[
               {
                 required: true,
-                message: '请输入手机号！',
+                message: 'feild is required!',
               },
               {
                 pattern: /^1\d{10}$/,
-                message: '手机号格式错误！',
+                message: 'wrong number!',
               },
             ]}
           />
           <Captcha
             name="captcha"
-            placeholder="验证码"
+            placeholder="captcha"
             countDown={120}
             getCaptchaButtonText=""
             getCaptchaSecondText="秒"
             rules={[
               {
                 required: true,
-                message: '请输入验证码！',
+                message: 'feild is required!',
               },
             ]}
           />
-        </Tab>
+        </Tab> */}
         <div>
           <Checkbox checked={autoLogin} onChange={(e) => setAutoLogin(e.target.checked)}>
-            自动登录
+            Remember me
           </Checkbox>
-          <a
-            style={{
-              float: 'right',
-            }}
-          >
-            忘记密码
-          </a>
         </div>
-        <Submit loading={submitting}>登录</Submit>
-        <div className={styles.other}>
+        <Submit loading={submitting}>Login</Submit>
+        {/* <div className={styles.other}>
           其他登录方式
           <AlipayCircleOutlined className={styles.icon} />
           <TaobaoCircleOutlined className={styles.icon} />
@@ -124,7 +117,7 @@ const Login: React.FC<LoginProps> = (props) => {
           <Link className={styles.register} to="/user/register">
             注册账户
           </Link>
-        </div>
+        </div> */}
       </LoginForm>
     </div>
   );

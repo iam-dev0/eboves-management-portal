@@ -1,5 +1,5 @@
 import { Effect, Reducer } from 'umi';
-import { PostStockRequest, getStockOrder } from './service';
+import { PostStockRequest, getStockOrder, stockReceived, cancelOrder ,sendOrder} from './service';
 
 export interface StateType {
   stockOrder?: any;
@@ -10,6 +10,9 @@ export interface ModelType {
   effects: {
     PostStockRequest: Effect;
     fetchOrder: Effect;
+    stockReceived: Effect;
+    sendOrder:Effect;
+    cancelOrder: Effect;
   };
   reducers?: {
     putStockOrder: Reducer<StateType>;
@@ -32,6 +35,17 @@ const BrandsModal: ModelType = {
         type: 'putStockOrder',
         payload: typeof response === 'object' ? response.data : {},
       });
+    },
+    *stockReceived({ payload }, { call, put }) {
+      const response = yield call(stockReceived, payload);
+    },
+    *cancelOrder({ payload, callback }, { call, put }) {
+      const response = yield call(cancelOrder, payload);
+      if (callback) callback(response);
+    },
+    *sendOrder({ payload, callback }, { call, put }) {
+      const response = yield call(sendOrder, payload);
+      if (callback) callback(response);
     },
   },
 

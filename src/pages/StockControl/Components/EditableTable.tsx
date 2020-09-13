@@ -179,15 +179,15 @@ const EditableTableFooter: React.FC<any> = ({ handleAdd, outlet }) => {
 
 const EditableTable: React.FC<any> = ({ value = [], onChange, outlet }) => {
   const [dataSource, setdataSource] = useState<Item[]>([
-    {
-      id: 98,
-      name: 'm3sK x8 QFTyX7 TPVS Z9MG',
-      availableQuantity: 32,
-      sku: '44bfd537-a4e44e8',
-      quantity: 3,
-      supplierPrice: 120,
-      totalCost: 3,
-    },
+    // {
+    //   id: 98,
+    //   name: 'm3sK x8 QFTyX7 TPVS Z9MG',
+    //   availableQuantity: 32,
+    //   sku: '44bfd537-a4e44e8',
+    //   quantity: 3,
+    //   supplierPrice: 120,
+    //   totalCost: 3,
+    // },
   ]);
 
   useEffect(() => {
@@ -295,9 +295,6 @@ const EditableTable: React.FC<any> = ({ value = [], onChange, outlet }) => {
 
   return (
     <div>
-      {/* <Button onClick={handleAdd} type="primary" style={{ marginBottom: 16 }}>
-        Add a row
-      </Button> */}
       <Table
         className="CustomEditableTable"
         components={components}

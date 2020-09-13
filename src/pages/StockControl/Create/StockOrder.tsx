@@ -10,9 +10,9 @@ import {
   RouteContext,
 } from '@ant-design/pro-layout';
 import DeliverySvg from '@/assets/svgs/delivery.svg';
-import { ModelType } from '../model';
-import EditableTable from './Components/EditableTable';
 import { OutletItem } from '@/pages/ProductModule/Outlets/data';
+import { ModelType } from '../model';
+import EditableTable from '../Components/EditableTable';
 
 interface CreateFormProps {
   dispatch: Dispatch;

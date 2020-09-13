@@ -2,13 +2,15 @@ import React, { Component } from 'react';
 import { connect, ConnectProps } from 'umi';
 import { Tag, message } from 'antd';
 import groupBy from 'lodash/groupBy';
-import moment from 'moment';
+import * as dayjs from 'dayjs';
 import { NoticeItem } from '@/models/global';
 import { CurrentUser } from '@/models/user';
 import { ConnectState } from '@/models/connect';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import NoticeIcon from '../NoticeIcon';
 import styles from './index.less';
 
+dayjs.extend(relativeTime);
 export interface GlobalHeaderRightProps extends Partial<ConnectProps> {
   notices?: NoticeItem[];
   currentUser?: CurrentUser;
@@ -65,7 +67,7 @@ class GlobalHeaderRight extends Component<GlobalHeaderRightProps> {
       const newNotice = { ...notice };
 
       if (newNotice.datetime) {
-        newNotice.datetime = moment(notice.datetime as string).fromNow();
+        newNotice.datetime = dayjs(notice.datetime as string).fromNow();
       }
 
       if (newNotice.id) {

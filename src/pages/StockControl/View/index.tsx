@@ -1,34 +1,17 @@
 import { DownloadOutlined, EditOutlined, PrinterOutlined } from '@ant-design/icons';
-import { Button, Descriptions, Card } from 'antd';
+import { Button, Card } from 'antd';
 import React, { useEffect } from 'react';
-import { connect, history } from 'umi';
+import { connect, history, Link } from 'umi';
 import { PageHeaderWrapper, RouteContext } from '@ant-design/pro-layout';
 import ProTable, { ProColumns, IntlProvider, enUSIntl } from '@ant-design/pro-table';
-import dayjs from 'dayjs';
+import OrderBasicView from '../Components/OrderBasicView';
 import { generateStockRequestPdf } from '../service';
 
 const StockRequestView: React.FC<any> = (props) => {
   const { loading, dispatch } = props;
   const { id } = props.match.params;
   const {
-    stock: {
-      stockOrder: {
-        createdAt,
-        createdBy,
-        delieveryDate,
-        supplierId,
-        note,
-        orderNumber,
-        outletId,
-        status,
-        supplierInvoiceNumber,
-        supplier,
-        outlet,
-        updatedAt,
-        variations,
-        updatedBy,
-      },
-    },
+    stock: { stockOrder },
   } = props;
 
   useEffect(() => {
@@ -94,15 +77,31 @@ const StockRequestView: React.FC<any> = (props) => {
     }
   };
 
+  const onCancelHandler = () => {
+    dispatch({ type: 'stock/cancelOrder', payload: id });
+  };
+
+  const onSendHandler = () => {
+    dispatch({ type: 'stock/sendOrder', payload: id });
+  };
   const action = (
     <RouteContext.Consumer>
       {() => (
         <>
           <Button.Group style={{ marginRight: '10px' }}>
-            <Button type="primary">Receive</Button>
-            <Button type="primary" icon={<EditOutlined />}>
-              Edit
-            </Button>
+            {(stockOrder.status === 'OPEN' || stockOrder.status === 'SENT') && (
+              <Button onClick={onSendHandler}>Send</Button>
+            )}
+            {(stockOrder.status === 'OPEN' || stockOrder.status === 'SENT') && (
+              <Link to={`/stock-control-module/stock-movement/${id}/receive`}>
+                <Button type="primary">Receive</Button>
+              </Link>
+            )}
+            {(stockOrder.status === 'OPEN' || stockOrder.status === 'SENT') && (
+              <Button type="primary" icon={<EditOutlined />}>
+                Edit
+              </Button>
+            )}
             <Button type="primary" onClick={onPrintHandler} icon={<PrinterOutlined />}>
               Print
             </Button>
@@ -110,7 +109,9 @@ const StockRequestView: React.FC<any> = (props) => {
               Download
             </Button>
           </Button.Group>
-          <Button>Cancel</Button>
+          {(stockOrder.status === 'OPEN' || stockOrder.status === 'SENT') && (
+            <Button onClick={onCancelHandler}>Cancel</Button>
+          )}
         </>
       )}
     </RouteContext.Consumer>
@@ -175,27 +176,14 @@ const StockRequestView: React.FC<any> = (props) => {
 
   return (
     <PageHeaderWrapper extra={action}>
-      <Card title={`${orderNumber} (${status})`} bordered={false}>
-        <Descriptions>
-          <Descriptions.Item label="Supplier">{supplier?.name}</Descriptions.Item>
-          <Descriptions.Item label="Deliver to">{outlet?.name}</Descriptions.Item>
-          <Descriptions.Item label="Delivery due">
-            {dayjs(delieveryDate).format('MMMM D YYYY, h:mm:ss a')}
-          </Descriptions.Item>
-          <Descriptions.Item label="Supplier Invoice ">{supplierInvoiceNumber}</Descriptions.Item>
-          <Descriptions.Item label="Created">
-            {dayjs(createdAt).format('MMMM D YYYY, h:mm:ss a')}
-          </Descriptions.Item>
-          {/* <Descriptions.Item label="Recived">{}</Descriptions.Item> */}
-          <Descriptions.Item label="Created by">{createdBy}</Descriptions.Item>
-          <Descriptions.Item label="Note">{note}</Descriptions.Item>
-        </Descriptions>
+      <Card title={`${stockOrder?.orderNumber} (${stockOrder?.status})`} bordered={false}>
+        <OrderBasicView OrderInfo={stockOrder} />
       </Card>
       <IntlProvider value={enUSIntl}>
         <ProTable<any>
           loading={loading}
           search={false}
-          dataSource={variations}
+          dataSource={stockOrder?.variations}
           headerTitle="Products"
           rowKey="id"
           toolBarRender={() => [

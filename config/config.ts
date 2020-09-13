@@ -3,6 +3,7 @@ import { defineConfig } from 'umi';
 import defaultSettings from './defaultSettings';
 import proxy from './proxy';
 import routes from './routes';
+import {compact} from './theme';
 
 const { REACT_APP_ENV } = process.env;
 
@@ -30,6 +31,7 @@ export default defineConfig({
   // Theme for antd: https://ant.design/docs/react/customize-theme-cn
   theme: {
     // ...darkTheme,
+     ...compact,
     'primary-color': defaultSettings.primaryColor,
   },
   // @ts-ignore
