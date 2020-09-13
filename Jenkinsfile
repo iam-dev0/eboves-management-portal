@@ -46,6 +46,8 @@ pipeline {
               cd /var/www/StagingServer/BackOffice
               git stash
               git pull
+              git checkout dev 
+              
               yarn
               yarn build
 
