@@ -6,7 +6,7 @@ import { PageHeaderWrapper, GridContent, getPageTitle, MenuDataItem } from '@ant
 import UploadImages from '@/components/UploadImages';
 import EditableTagGroup from '@/components/AddTags';
 import { upload } from '../service';
-import {ModelType} from '../model';
+import { ModelType } from '../model';
 
 interface CreateFormProps {
   dispatch: Dispatch;
@@ -58,8 +58,8 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
     if (brand) {
       const values = {
         ...brand,
-        logo: !brand.logo || [{ uid: 1, url: brand.logo }],
-        storyCover: !brand.storyCover || [{ uid: 1, url: brand.storyCover }],
+        logo: brand.logo ? [{ uid: 1, url: brand.logo }] : undefined,
+        storyCover: brand.storyCover?[{ uid: 1, url: brand.storyCover }]:undefined,
         metaKeywords: brand.metaKeywords?.split(','),
       };
       form.setFieldsValue(values);
@@ -136,7 +136,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
               >
                 <Input placeholder="Please enter user name" />
               </Form.Item>
-              <Form.Item
+              {/* <Form.Item
                 name="supplierId"
                 label="Supplier"
                 rules={[{ required: true, message: 'Please select your country!' }]}
@@ -148,7 +148,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
                     </Option>
                   ))}
                 </Select>
-              </Form.Item>
+              </Form.Item> */}
               <Form.Item name="logo" label="Logo">
                 <UploadImages request={upload} />
               </Form.Item>

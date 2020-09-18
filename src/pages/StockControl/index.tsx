@@ -51,7 +51,7 @@ const TableList: React.FC<any> = (props) => {
     {
       title: (_, type) => (type === 'table' ? 'From' : 'Suppliers'),
       dataIndex: 'supplier',
-      renderText: (text) => text?.name,
+      renderText: (text) => text?.companyName,
       sorter: true,
     },
     {

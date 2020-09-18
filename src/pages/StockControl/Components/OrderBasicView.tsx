@@ -10,7 +10,7 @@ const BasicOrderView: React.FC<any> = ({
   return (
     <div>
       <Descriptions>
-        <Descriptions.Item label="Supplier">{supplier?.name}</Descriptions.Item>
+        <Descriptions.Item label="Supplier">{supplier?.companyName}</Descriptions.Item>
         <Descriptions.Item label="Deliver to">{outlet?.name}</Descriptions.Item>
         <Descriptions.Item label="Delivery due">
           {dayjs(delieveryDate).format('MMMM D YYYY, h:mm:ss a')}

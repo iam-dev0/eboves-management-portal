@@ -126,7 +126,8 @@ const StockRequestView: React.FC<any> = (props) => {
     },
     {
       title: 'Name',
-      dataIndex: 'name',
+      dataIndex: 'supplier',
+      render:(text:any)=>text?.companyName,
       fixed: 'left',
     },
     {

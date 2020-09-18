@@ -29,22 +29,22 @@ export default [
             icon: 'smile',
             component: './Welcome',
           },
-          {
-            path: '/admin',
-            name: 'admin',
-            icon: 'crown',
-            component: './Admin',
-            authority: ['admin'],
-            routes: [
-              {
-                path: '/admin/sub-page',
-                name: 'sub-page',
-                icon: 'smile',
-                component: './Welcome',
-                authority: ['admin'],
-              },
-            ],
-          },
+          // {
+          //   path: '/admin',
+          //   name: 'admin',
+          //   icon: 'crown',
+          //   component: './Admin',
+          //   authority: ['admin'],
+          //   routes: [
+          //     {
+          //       path: '/admin/sub-page',
+          //       name: 'sub-page',
+          //       icon: 'smile',
+          //       component: './Welcome',
+          //       authority: ['admin'],
+          //     },
+          //   ],
+          // },
           {
             path: '/product-module',
             name: 'Products',

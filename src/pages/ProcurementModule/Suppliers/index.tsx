@@ -15,10 +15,16 @@ const TableList: React.FC<any> = (props) => {
   const actionRef = useRef<ActionType>();
   const [expandedRowKeys, setExpandedRowKeys] = useState<number[]>([]);
 
-  const {
-    loading,
-    dispatch,
-  } = props;
+  const { loading, dispatch } = props;
+
+  useEffect(() => {
+    return () => {
+      dispatch({
+        type: 'suppliers/putSupplier',
+        payload: {},
+      });
+    };
+  }, []);
 
   const toggleActiveStatus = (id: number) => {
     dispatch({ type: 'suppliers/toggleActiveStatus', payload: id });
