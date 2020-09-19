@@ -12,6 +12,7 @@ const Uploader: React.FC<any> = ({
   value = {},
   showUploadList,
   onChange,
+  ...props
 }: any) => {
   const [fileList, setfileList] = useState<any>([]);
 
@@ -53,6 +54,7 @@ const Uploader: React.FC<any> = ({
               multiple
               style={{ margin: '5px' }}
               accept=".JPEG,.JPG,.PNG,.gif,.jfif,.octet-stream"
+              {...props}
             >
               <p className="ant-upload-drag-icon">
                 <InboxOutlined />
@@ -92,6 +94,7 @@ const Uploader: React.FC<any> = ({
             }
             accept=".JPEG,.JPG,.PNG,.gif,.jfif,.octet-stream"
             multiple
+            {...props}
           >
             <Button>
               <UploadOutlined /> Click to Upload
@@ -118,6 +121,7 @@ const Uploader: React.FC<any> = ({
             multiple
             style={{ margin: '5px' }}
             accept=".JPEG,.JPG,.PNG,.gif,.jfif,.octet-stream"
+            {...props}
           >
             <p className="ant-upload-drag-icon">
               <InboxOutlined />

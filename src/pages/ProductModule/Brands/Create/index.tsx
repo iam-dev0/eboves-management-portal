@@ -5,7 +5,7 @@ import { connect, Dispatch, history } from 'umi';
 import { PageHeaderWrapper, GridContent, getPageTitle, MenuDataItem } from '@ant-design/pro-layout';
 import UploadImages from '@/components/UploadImages';
 import EditableTagGroup from '@/components/AddTags';
-import { upload } from '../service';
+import { upload } from '@/services/upload';
 import { ModelType } from '../model';
 
 interface CreateFormProps {
@@ -150,7 +150,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
                 </Select>
               </Form.Item> */}
               <Form.Item name="logo" label="Logo">
-                <UploadImages request={upload} />
+                <UploadImages request={upload} data={{ folder: 'imagesbrands/logo/' }}/>
               </Form.Item>
               <Divider orientation="left">Meta Information</Divider>
 
@@ -170,7 +170,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
               </Form.Item>
               <Form.Item label="Story Cover">
                 <Form.Item name="storyCover" noStyle>
-                  <UploadImages wall request={upload} />
+                  <UploadImages wall request={upload} data={{ folder: 'imagesbrands/banners/' }}/>
                 </Form.Item>
               </Form.Item>
 

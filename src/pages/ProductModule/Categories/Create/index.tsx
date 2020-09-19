@@ -5,7 +5,7 @@ import { PageHeaderWrapper, GridContent, getPageTitle, MenuDataItem } from '@ant
 import UploadImages from '@/components/UploadImages';
 import EditableTagGroup from '@/components/AddTags';
 import { findPath } from '@/utils/utils';
-import { upload } from '../service';
+import { upload } from '@/services/upload';
 
 interface CreateFormProps {
   dispatch: Dispatch;
@@ -161,7 +161,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
                 <Cascader showSearch={{ filter }} options={categories} changeOnSelect />
               </Form.Item>
               <Form.Item name="image" label="Image">
-                <UploadImages request={upload} />
+                <UploadImages request={upload} data={{ folder: 'imagesbrands/logo/' }}/>
               </Form.Item>
               <Divider orientation="left">Meta Information</Divider>
 
@@ -181,7 +181,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
               </Form.Item>
               <Form.Item label="Story Cover">
                 <Form.Item name="storyCover" noStyle>
-                  <UploadImages wall request={upload} />
+                  <UploadImages wall request={upload} data={{ folder: 'imagesbrands/banners/' }}/>
                 </Form.Item>
               </Form.Item>
 

@@ -19,7 +19,7 @@ import { PageHeaderWrapper, RouteContext } from '@ant-design/pro-layout';
 import UploadImages from '@/components/UploadImages';
 import dayjs from 'dayjs';
 import styles from './style.less';
-import { upload } from '../service';
+import { upload } from '@/services/upload';
 
 const FormItem = Form.Item;
 
@@ -195,7 +195,7 @@ const CreateVariationForm: React.FC<any> = (props) => {
                   name={[index, 'value']}
                   // fieldKey={[attribute.id, 'attribute']}
                 >
-                  <UploadImages type="button" />
+                  <UploadImages type="button" data={{ folder: 'images/attributes/' }}/>
                 </Form.Item>
               </Col>
               <Col lg={16} md={16} sm={16}>
@@ -299,7 +299,7 @@ const CreateVariationForm: React.FC<any> = (props) => {
             <Row gutter={16}>
               <Col lg={24} md={24} sm={24}>
                 <FormItem name={[field.name, 'images']} label="Images">
-                  <UploadImages type="wall-list" request={upload} />
+                  <UploadImages type="wall-list" request={upload} data={{ folder: 'images/products/' }} />
                 </FormItem>
               </Col>
             </Row>
