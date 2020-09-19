@@ -19,6 +19,7 @@ const VariationView: React.FC<any> = ({
     shortDescription,
     attributeValues,
     mainBarcode,
+    mainImage,
     supplierPrice,
     barcodes,
     images,
@@ -27,8 +28,8 @@ const VariationView: React.FC<any> = ({
   const photos = images
     ? images?.map((image: { id: string; image: string }) => ({
         src: image.image,
-        width: Math.floor(Math.random() * 4) + 1,
-        height: Math.floor(Math.random() * 4) + 1,
+        width: 100,
+        height: 100,
       }))
     : [];
   return (
@@ -98,7 +99,7 @@ const VariationView: React.FC<any> = ({
 
         <Tabs.TabPane tab="Images" key="2">
           <div className={styles.imageGallery}>
-            <Gallery photos={photos} onClick={(e, { photo }) => window.open(photo.src, '_blank')} />
+            <Gallery photos={[{src:mainImage},...photos]} onClick={(e, { photo }) => window.open(photo.src, '_blank')} />
           </div>
         </Tabs.TabPane>
       </Tabs>
