@@ -29,23 +29,22 @@ export default [
             icon: 'smile',
             component: './Welcome',
           },
-          {
-            path: '/admin',
-            name: 'admin',
-            icon: 'crown',
-            component: './Admin',
-            authority: ['admin'],
-            routes: [
-              {
-                path: '/admin/sub-page',
-                name: 'sub-page',
-                icon: 'smile',
-                component: './Welcome',
-                authority: ['admin'],
-              },
-            ],
-          },
-
+          // {
+          //   path: '/admin',
+          //   name: 'admin',
+          //   icon: 'crown',
+          //   component: './Admin',
+          //   authority: ['admin'],
+          //   routes: [
+          //     {
+          //       path: '/admin/sub-page',
+          //       name: 'sub-page',
+          //       icon: 'smile',
+          //       component: './Welcome',
+          //       authority: ['admin'],
+          //     },
+          //   ],
+          // },
           {
             path: '/product-module',
             name: 'Products',
@@ -216,12 +215,24 @@ export default [
                 component: './StockControl/View',
               },
               {
+                path: '/stock-control-module/stock-movement/:id/receive',
+                name: 'Received Stack',
+                icon: 'smile',
+                component: './StockControl/Create/StockReceive',
+              },
+              {
                 path: '/stock-control-module/purchase-order/add',
                 name: 'New Stock Order',
                 icon: 'smile',
                 component: './StockControl/Create/StockOrder',
               },
             ],
+          },
+          {
+            name: 'Orders Processing',
+            icon: 'table',
+            path: '/orders/list',
+            component: './Order',
           },
           {
             name: 'list.table-list',

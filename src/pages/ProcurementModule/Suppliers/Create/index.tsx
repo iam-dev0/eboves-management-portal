@@ -1,9 +1,7 @@
 import React, { useEffect } from 'react';
 import { Form, Button, Input, Select, Card, Spin, Divider } from 'antd';
-
 import { connect, Dispatch, history } from 'umi';
 import { PageHeaderWrapper, GridContent, getPageTitle, MenuDataItem } from '@ant-design/pro-layout';
-import { ModelType } from '../model';
 
 interface CreateFormProps {
   dispatch: Dispatch;
@@ -42,6 +40,10 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
     return () => {
       dispatch({
         type: 'brands/resetStates',
+      });
+      dispatch({
+        type: 'suppliers/putSupplier',
+        payload: {},
       });
       form.resetFields();
     };
@@ -116,17 +118,17 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
               <Form.Item name="code" label="Supplier Code">
                 <Input placeholder="enter." />
               </Form.Item>
-              <Form.Item name="countryId" label="Country">
+              {/* <Form.Item name="countryId" label="Country">
                 <Select placeholder="Please select a supplier">
-                  {suppliers.map((supplier: any) => (
-                    <Option value={supplier.id} key={supplier.id}>
-                      {supplier.name}
+                  {suppliers.map((item: any) => (
+                    <Option value={item.id} key={item.id}>
+                      {item.name}
                     </Option>
                   ))}
                 </Select>
-              </Form.Item>
+              </Form.Item> */}
 
-              <Form.Item label="Brands" name="brands">
+              {/* <Form.Item label="Brands" name="brands">
                 <Select
                   mode="multiple"
                   placeholder="Select attributes"
@@ -138,7 +140,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
                     </Option>
                   ))}
                 </Select>
-              </Form.Item>
+              </Form.Item> */}
               <Form.Item name="website" label="Website">
                 <Input placeholder="Please enter.." />
               </Form.Item>
@@ -183,17 +185,16 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
 
 export default connect(
   ({
-    brands,
     suppliers,
+    brands,
     loading,
   }: {
-    brands: ModelType;
     suppliers: any;
+    brands: any;
     loading: { models: { [key: string]: boolean } };
   }) => ({
-    brands,
     suppliers,
-    // loading: loading.models.suppliers,
-    loading: false,
+    brands,
+    loading: loading.models.suppliers || false,
   }),
 )(CreateForm);

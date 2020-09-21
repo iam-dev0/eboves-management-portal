@@ -33,7 +33,7 @@ pipeline {
     //   }
     // }
 
-    stage('deploy') {
+    stage('deploy dev') {
       when {
         expression {
           BRANCH_NAME == 'dev'
@@ -46,6 +46,31 @@ pipeline {
               cd /var/www/StagingServer/BackOffice
               git stash
               git pull
+              git checkout dev 
+
+              yarn
+              yarn build
+
+            \'
+            '''
+      }
+    }
+
+    stage('deploy master') {
+      when {
+        expression {
+          BRANCH_NAME == 'master'
+        }
+
+      }
+      steps {
+        echo 'deploying'
+        sh '''ssh cdjenkins@172.104.186.220 \'
+              cd /var/www/LiverServer/BackOffice
+              git stash
+              git pull
+              git checkout master 
+
               yarn
               yarn build
 

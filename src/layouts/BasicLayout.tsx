@@ -163,7 +163,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
       <Authorized authority={authorized!.authority} noMatch={noMatch}>
         {children}
       </Authorized>
-      <SettingDrawer
+      {/* <SettingDrawer
         hideColors={false}
         settings={settings}
         onSettingChange={(config) =>
@@ -172,7 +172,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
             payload: config,
           })
         }
-      />
+      /> */}
     </ProLayout>
   );
 };

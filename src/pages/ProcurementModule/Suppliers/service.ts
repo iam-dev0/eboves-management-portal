@@ -1,7 +1,7 @@
 import request from '@/utils/request';
 
 export async function getAllSuppliers(params: any) {
-  return request(`suppliers`);
+  return request(`suppliers`, { method: 'GET', params });
 }
 export async function fetchSupplier(id: number) {
   return request(`suppliers/${id}`);

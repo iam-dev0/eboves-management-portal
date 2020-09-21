@@ -5,7 +5,7 @@ import { PageHeaderWrapper, GridContent, getPageTitle, MenuDataItem } from '@ant
 import UploadImages from '@/components/UploadImages';
 import EditableTagGroup from '@/components/AddTags';
 import { findPath } from '@/utils/utils';
-import { upload } from '../service';
+import { upload } from '@/services/upload';
 
 interface CreateFormProps {
   dispatch: Dispatch;
@@ -62,6 +62,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
     if (category) {
       const values = {
         ...category,
+        categoryId: [],
         image: category.image ? [{ uid: 1, url: category.image }] : undefined,
         storyCover: category.storyCover ? [{ uid: 1, url: category.storyCover }] : undefined,
         metaKeywords: category.metaKeywords?.split(','),
@@ -149,15 +150,18 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
               <Form.Item
                 name="name"
                 label="Name"
-                rules={[{ required: true, message: 'Please enter user name' }]}
+                rules={[{ required: true, message: 'Please enter name' }]}
               >
                 <Input placeholder="Please enter user name" />
+              </Form.Item>
+              <Form.Item name="slug" label="Slug">
+                <Input placeholder="Please here" />
               </Form.Item>
               <Form.Item name="categoryId" label="Parent Category">
                 <Cascader showSearch={{ filter }} options={categories} changeOnSelect />
               </Form.Item>
               <Form.Item name="image" label="Image">
-                <UploadImages request={upload} />
+                <UploadImages request={upload} data={{ folder: 'imagesbrands/logo/' }}/>
               </Form.Item>
               <Divider orientation="left">Meta Information</Divider>
 
@@ -177,7 +181,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
               </Form.Item>
               <Form.Item label="Story Cover">
                 <Form.Item name="storyCover" noStyle>
-                  <UploadImages wall request={upload} />
+                  <UploadImages wall request={upload} data={{ folder: 'imagesbrands/banners/' }}/>
                 </Form.Item>
               </Form.Item>
 

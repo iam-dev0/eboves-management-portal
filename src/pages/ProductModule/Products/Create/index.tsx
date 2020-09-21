@@ -4,9 +4,9 @@ import { connect, Dispatch, history } from 'umi';
 import { PageHeaderWrapper, GridContent, getPageTitle, MenuDataItem } from '@ant-design/pro-layout';
 import UploadImages from '@/components/UploadImages';
 import EditableTagGroup from '@/components/AddTags';
-import { upload } from '../service';
-import { AttributeItem } from '../../Attributes/data';
 import { findPath } from '@/utils/utils';
+import { upload } from '@/services/upload';
+import { AttributeItem } from '../../Attributes/data';
 
 interface CreateFormProps {
   dispatch: Dispatch;
@@ -82,7 +82,8 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
     dispatch({ type: 'categories/fetchCategories' });
     return () => {
       dispatch({ type: 'products/reset' });
-      form.resetFields();}
+      form.resetFields();
+    };
   }, []);
 
   const onFinish = (values: any) => {
@@ -243,17 +244,17 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
                 <Col lg={24} md={24} sm={24}>
                   <Form.Item label="Images">
                     <Form.Item name="images" noStyle>
-                      <UploadImages request={upload} type="wall-list" />
+                      <UploadImages request={upload} data={{ folder: 'imagesproducts/' }} type="wall-list" />
                     </Form.Item>
                   </Form.Item>
                 </Col>
-                <Col lg={24} md={24} sm={24}>
+                {/* <Col lg={24} md={24} sm={24}>
                   <Form.Item label="Description Image">
                     <Form.Item name="descriptionImage" noStyle>
-                      <UploadImages request={upload} />
+                      <UploadImages request={upload} data={{ folder: 'Name' }} />
                     </Form.Item>
                   </Form.Item>
-                </Col>
+                </Col> */}
                 <Col lg={24} md={24} sm={24}>
                   <FormItem label="Attributes" name="attributes">
                     <Select

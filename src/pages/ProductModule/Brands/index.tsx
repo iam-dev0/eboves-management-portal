@@ -111,7 +111,7 @@ const TableList: React.FC<any> = (props) => {
       },
       onFilter: (value: any, record: BrandItem) => {
         const v = value.toLowerCase() === 'true';
-        return record.active === v;
+        return record.featured === v;
       },
       renderText: (text, record) => {
         return (

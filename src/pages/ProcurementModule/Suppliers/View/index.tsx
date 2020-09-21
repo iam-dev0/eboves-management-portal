@@ -41,11 +41,11 @@ const SupplierView: React.FC<any> = (props) => {
       <Descriptions.Item label="Website" span={3}>
         {website}
       </Descriptions.Item>
-      <Descriptions.Item label="Brands" span={3}>
+      {/* <Descriptions.Item label="Brands" span={3}>
         <Tag color="green">brand1</Tag>
         <Tag color="green">brand1</Tag>
         <Tag color="green">brand1</Tag>
-      </Descriptions.Item>
+      </Descriptions.Item> */}
       <Descriptions.Item label="Description">{description}</Descriptions.Item>
     </Descriptions>
   );
@@ -60,6 +60,6 @@ export default connect(
     loading: { models: { [key: string]: boolean } };
   }) => ({
     suppliers,
-    loading: loading.models.suppliers,
+    loading: loading.models.suppliers || false,
   }),
 )(SupplierView);

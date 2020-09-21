@@ -1,19 +1,16 @@
-import { PlusOutlined, DeleteOutlined, DownOutlined, RightOutlined } from '@ant-design/icons';
-import { Button, Switch, Input, Tag, Descriptions, Badge } from 'antd';
+import { Button, Input } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
-import { connect, history } from 'umi';
+import { connect, history, Link } from 'umi';
 import { PageHeaderWrapper, RouteContext } from '@ant-design/pro-layout';
 import ProTable, { ProColumns, ActionType, IntlProvider, enUSIntl } from '@ant-design/pro-table';
 import { SorterResult } from 'antd/es/table/interface';
-import styles from './index.less';
-import { getAllSuppliers as fetchSuppliers } from '../ProcurementModule/Suppliers/index';
-import { SupplierItem } from './data';
-import SupplierView from './View';
+
+
+import { getAllStockRequests } from './service';
 
 const TableList: React.FC<any> = (props) => {
   const [sorter, setSorter] = useState<string>('');
   const actionRef = useRef<ActionType>();
-  const [expandedRowKeys, setExpandedRowKeys] = useState<number[]>([]);
 
   const { loading, dispatch } = props;
 
@@ -22,7 +19,9 @@ const TableList: React.FC<any> = (props) => {
       {() => (
         <>
           <Button.Group>
-            <Button type="primary">Order Stock</Button>
+            <Link to="/stock-control-module/purchase-order/add">
+              <Button type="primary">Order Stock</Button>
+            </Link>
             <Button type="primary" style={{ margin: '0px 5px 0px 5px' }}>
               Receive Stock
             </Button>
@@ -36,114 +35,116 @@ const TableList: React.FC<any> = (props) => {
     </RouteContext.Consumer>
   );
 
-  const toggleActiveStatus = (id: number) => {
-    dispatch({ type: 'suppliers/toggleActiveStatus', payload: id });
-  };
-
-  const handleBulkDelete = (ids: any) => {
-    dispatch({
-      type: 'suppliers/bulkDelete',
-      payload: ids,
-      callback: () => {
-        // eslint-disable-next-line no-unused-expressions
-        actionRef.current?.reload();
-        // eslint-disable-next-line no-unused-expressions
-        actionRef.current?.clearSelected();
-      },
-    });
-  };
-
-  const columns: ProColumns<SupplierItem>[] = [
+  const columns: ProColumns<any>[] = [
     {
-      title: 'Name',
-      dataIndex: 'name',
+      title: 'Number',
+      dataIndex: 'orderNumber',
+      formItemProps: {
+        placeholder: 'Name / Number / Product / Supplier Invoice',
+      },
+      renderText: (text, record) => (
+        <span style={{ textDecoration: 'underline', marginLeft: '10px' }}>
+          <Link to={`/stock-control-module/stock-movement/${record.id}`}> {text}</Link>
+        </span>
+      ),
     },
     {
-      title: 'Active',
-      dataIndex: 'active',
+      title: (_, type) => (type === 'table' ? 'From' : 'Suppliers'),
+      dataIndex: 'supplier',
+      renderText: (text) => text?.companyName,
       sorter: true,
-      width: '10%',
+    },
+    {
+      title: (_, type) => (type === 'table' ? 'To' : 'Outlets'),
+      dataIndex: 'outlet',
+      renderText: (text) => text?.name,
+      sorter: true,
+    },
+    {
+      title: 'Items',
+      dataIndex: 'variations',
+      renderText: (text) => text.length,
+      sorter: true,
+      hideInSearch: true,
+    },
+    {
+      title: (_, type) => (type === 'table' ? 'Status' : 'Show'),
+      dataIndex: 'status',
+      sorter: true,
+      // valueType:'option',
       valueEnum: {
-        true: {
-          text: 'Active',
+        OPEN: {
+          text: 'Open orders',
+          status: 'Default',
         },
-        false: {
-          text: 'Inactive',
+        RETURN_OPEN: {
+          text: 'Open returns',
+          status: 'Default',
         },
-      },
-      onFilter: (value: any, record: SupplierItem) => {
-        const v = value.toLowerCase() === 'true';
-        return record.active === v;
-      },
-      renderText: (text, record) => {
-        return (
-          <Switch
-            defaultChecked={text === 'Active'}
-            onChange={() => toggleActiveStatus(record.id)}
-          />
-        );
+        SENT: {
+          text: 'Sent orders',
+          status: 'Processing',
+        },
+        DISPATCHED: {
+          text: 'Sent returns',
+          status: 'Processing',
+        },
+        RETURN_SENT: {
+          text: 'Dispatched orders',
+          status: 'Processing',
+        },
+        RECEIVED: {
+          text: 'Received orders',
+          status: 'Success',
+        },
+        OVERDUE: {
+          text: 'Overdue orders',
+          status: 'Error',
+        },
+        CANCELLED: {
+          text: 'Cancelled orders',
+          status: 'Error',
+        },
+        RECEIVE_FAIL: {
+          text: 'Failed orderss',
+          status: 'Error',
+        },
       },
     },
     {
       title: 'Created At',
       dataIndex: 'createdAt',
       sorter: true,
-      valueType: 'dateTime',
+      valueType: 'date',
       hideInSearch: true,
-      renderFormItem: (item, { defaultRender, ...rest }, form) => {
-        const status = form.getFieldValue('status');
-        if (`${status}` === '0') {
-          return false;
-        }
-        if (`${status}` === '3') {
-          return <Input {...rest} placeholder="请输入异常原因！" />;
-        }
-        return defaultRender(item);
-      },
     },
     {
-      title: 'Action',
-      dataIndex: 'option',
-      valueType: 'option',
-      render: (_, record: SupplierItem) => (
-        <span className="table-operation">
-          <a onClick={() => history.push(`suppliers/update/${record.id}`)}>Edit</a>
-        </span>
+      key: 'action',
+      hideInSearch: true,
+      render: (_, record: any) => (
+        <>
+          <span className="table-operation">
+            <a onClick={() => history.push(`/stock-control-module/stock-movement/${record.id}`)}>
+              View
+            </a>
+          </span>
+        </>
       ),
     },
   ];
 
-  const expandable = {
-    expandedRowKeys,
-    onExpand: (expanded: boolean, record: any) => {
-      setExpandedRowKeys(expanded ? [record.id] : []);
-      if (expanded) dispatch({ type: 'products/fetchSupplier', payload: record.id });
-    },
-    expandIcon: ({ expanded, onExpand, record }: any) =>
-      expanded ? (
-        <DownOutlined onClick={(e) => onExpand(record, e)} />
-      ) : (
-        <RightOutlined onClick={(e) => onExpand(record, e)} />
-      ),
-    expandedRowRender: (record: SupplierItem) => (
-      <div className={`${styles.ExpentableRow} supplierExpandableRow`}>
-        <SupplierView id={record.id} />
-      </div>
-    ),
-    rowExpandable: () => true,
-  };
   return (
     <PageHeaderWrapper extra={action}>
       <IntlProvider value={enUSIntl}>
-        <ProTable<SupplierItem>
+        <ProTable<any>
           loading={loading}
           className="OuterTable"
-          headerTitle="Our suppliers"
+          headerTitle="Our Stock Requests"
           actionRef={actionRef}
           rowKey="id"
           search={{ searchText: 'Search', resetText: 'Rest', submitText: 'Submit' }}
           onChange={(_, _filter, _sorter) => {
-            const sorterResult = _sorter as SorterResult<SupplierItem>;
+            const sorterResult = _sorter as SorterResult<any>;
             if (sorterResult.field && sorterResult.order) {
               setSorter(`${sorterResult.field}_${sorterResult.order}`);
             } else setSorter('');
@@ -151,25 +152,10 @@ const TableList: React.FC<any> = (props) => {
           params={{
             sorter,
           }}
-          toolBarRender={(action, { selectedRowKeys }) => [
-            <Button type="primary" onClick={() => history.push('suppliers/create')}>
-              <PlusOutlined /> New
-            </Button>,
-            selectedRowKeys && selectedRowKeys.length > 0 && (
-              <Button
-                icon={<DeleteOutlined />}
-                danger
-                onClick={() => handleBulkDelete(selectedRowKeys)}
-              >
-                Delete
-              </Button>
-            ),
-          ]}
+          toolBarRender={() => []}
           tableAlertRender={false}
-          request={(params) => fetchSuppliers(params)}
+          request={(params) => getAllStockRequests(params)}
           columns={columns}
-          rowSelection={{}}
-          expandable={expandable}
           pagination={{ showTotal: (total) => `Total ${total} items` }}
         />
       </IntlProvider>
