@@ -150,7 +150,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
                 </Select>
               </Form.Item> */}
               <Form.Item name="logo" label="Logo">
-                <UploadImages request={upload} data={{ folder: 'imagesbrands/logo/' }}/>
+                <UploadImages request={upload} data={{ folder: 'images/brands/logo/' }}/>
               </Form.Item>
               <Divider orientation="left">Meta Information</Divider>
 
@@ -170,7 +170,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
               </Form.Item>
               <Form.Item label="Story Cover">
                 <Form.Item name="storyCover" noStyle>
-                  <UploadImages wall request={upload} data={{ folder: 'imagesbrands/banners/' }}/>
+                  <UploadImages wall request={upload} data={{ folder: 'images/brands/banners/' }}/>
                 </Form.Item>
               </Form.Item>
 

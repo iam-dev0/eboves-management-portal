@@ -244,7 +244,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
                 <Col lg={24} md={24} sm={24}>
                   <Form.Item label="Images">
                     <Form.Item name="images" noStyle>
-                      <UploadImages request={upload} data={{ folder: 'imagesproducts/' }} type="wall-list" />
+                      <UploadImages request={upload} data={{ folder: 'images/products/' }} type="wall-list" />
                     </Form.Item>
                   </Form.Item>
                 </Col>
