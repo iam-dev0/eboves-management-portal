@@ -59,7 +59,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
       const values = {
         ...brand,
         logo: brand.logo ? [{ uid: 1, url: brand.logo }] : undefined,
-        storyCover: brand.storyCover?[{ uid: 1, url: brand.storyCover }]:undefined,
+        storyCover: brand.storyCover ? [{ uid: 1, url: brand.storyCover }] : undefined,
         metaKeywords: brand.metaKeywords?.split(','),
       };
       form.setFieldsValue(values);
@@ -105,6 +105,14 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
     });
   };
 
+  const nameHandler = () => {
+    const name = form.getFieldValue('name');
+    if (name)
+      form.setFieldsValue({
+        slug: `${name.replace(/[^\w]/gi, '-')}_${Math.floor(Math.random() * 100000)}`,
+      });
+  };
+
   const onFinishFailed = (error: any) => {
     form.scrollToField(error.errorFields[0].name, {
       behavior: 'smooth',
@@ -134,7 +142,14 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
                 label="Name"
                 rules={[{ required: true, message: 'Please enter user name' }]}
               >
-                <Input placeholder="Please enter user name" />
+                <Input placeholder="Please enter user name" onBlur={nameHandler} />
+              </Form.Item>
+              <Form.Item
+                name="slug"
+                label="Slug"
+                rules={[{ required: true, message: 'Please enter uniqe slug' }]}
+              >
+                <Input placeholder="Please here" />
               </Form.Item>
               {/* <Form.Item
                 name="supplierId"
@@ -150,7 +165,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
                 </Select>
               </Form.Item> */}
               <Form.Item name="logo" label="Logo">
-                <UploadImages request={upload} data={{ folder: 'images/brands/logo/' }}/>
+                <UploadImages request={upload} data={{ folder: 'images/brands/logo/' }} />
               </Form.Item>
               <Divider orientation="left">Meta Information</Divider>
 
@@ -170,7 +185,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
               </Form.Item>
               <Form.Item label="Story Cover">
                 <Form.Item name="storyCover" noStyle>
-                  <UploadImages wall request={upload} data={{ folder: 'images/brands/banners/' }}/>
+                  <UploadImages wall request={upload} data={{ folder: 'images/brands/banners/' }} />
                 </Form.Item>
               </Form.Item>
 

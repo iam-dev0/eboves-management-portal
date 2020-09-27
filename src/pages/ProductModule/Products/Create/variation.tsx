@@ -11,6 +11,8 @@ import {
   Spin,
   Tooltip,
   InputNumber,
+  Checkbox,
+  notification,
 } from 'antd';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { connect, history } from 'umi';
@@ -18,8 +20,9 @@ import { capitalizeFirstLetter } from '@/utils/utils';
 import { PageHeaderWrapper, RouteContext } from '@ant-design/pro-layout';
 import UploadImages from '@/components/UploadImages';
 import dayjs from 'dayjs';
-import styles from './style.less';
 import { upload } from '@/services/upload';
+import { CheckboxChangeEvent } from 'antd/lib/checkbox';
+import styles from './style.less';
 
 const FormItem = Form.Item;
 
@@ -72,7 +75,7 @@ const CreateVariationForm: React.FC<any> = (props) => {
           id: incommingAttribute[i].id,
           value: !Array.isArray(attribute[i].value)
             ? attribute[i].value
-            : attribute[i].value.filterImages[0],
+            : attribute[i].value.filterImages()[0]?.url,
           alt: attribute[i].alt,
         });
       }
@@ -183,7 +186,40 @@ const CreateVariationForm: React.FC<any> = (props) => {
     );
   };
 
-  const AttributeItem = (attribute: any, index: number) => {
+  const onAttribueOperationHandler = (
+    e: CheckboxChangeEvent,
+    attributeIndex: any,
+    variationIndex: any,
+  ) => {
+    const Images = form.getFieldValue(['variations', variationIndex, 'images']);
+
+    if (!Images)
+      return notification.error({
+        description: 'Please Upload an Image',
+        message: 'please make sure to upload an image above',
+      });
+    const variations = form.getFieldValue(['variations']);
+
+    const tem = variations.map((item: any, index: number) => {
+      if (variationIndex === index) {
+        return {
+          ...item,
+          // eslint-disable-next-line no-shadow
+          attributes: item.attributes.map((item: any, index: number) => {
+            if (attributeIndex === index) {
+              return { ...item, value: [Images[0]] };
+            }
+            return item;
+          }),
+        };
+      }
+      return item;
+    });
+    form.setFieldsValue({ variations: tem });
+    return true;
+  };
+
+  const AttributeItem = (attribute: any, index: number, variationIndex: string) => {
     switch (attribute.type) {
       case 'image':
         return (
@@ -191,14 +227,28 @@ const CreateVariationForm: React.FC<any> = (props) => {
             <Row gutter={12}>
               <Col lg={8} md={8} sm={8}>
                 <Form.Item
-                  label={capitalizeFirstLetter(attribute.name)}
+                  label={
+                    <div>
+                      {capitalizeFirstLetter(attribute.name)}: &nbsp; &nbsp;{' '}
+                      {/* <Checkbox
+                        onChange={(e) => onAttribueOperationHandler(e, index, variationIndex)}
+                      >
+                        Use main image
+                      </Checkbox> */}
+                    </div>
+                  }
                   name={[index, 'value']}
                   // fieldKey={[attribute.id, 'attribute']}
                 >
-                  <UploadImages type="button" data={{ folder: 'images/attributes/' }}/>
+                  <UploadImages
+                    type="button"
+                    data={{ folder: 'images/attributes/' }}
+                    request={upload}
+                  />
                 </Form.Item>
               </Col>
-              <Col lg={16} md={16} sm={16}>
+
+              <Col lg={8} md={8} sm={8}>
                 <Form.Item
                   label="Alt"
                   name={[index, 'alt']}
@@ -227,16 +277,6 @@ const CreateVariationForm: React.FC<any> = (props) => {
           </Row>
         );
     }
-  };
-  const AttributesList = () => {
-    return (
-      <div>
-        <Divider orientation="left">Attributes</Divider>
-        {product?.attributes?.map((attribute: any, index: number) =>
-          AttributeItem(attribute, index),
-        )}
-      </div>
-    );
   };
 
   const FormVaritions = (fields: any, { add, remove }: any) => {
@@ -299,14 +339,29 @@ const CreateVariationForm: React.FC<any> = (props) => {
             <Row gutter={16}>
               <Col lg={24} md={24} sm={24}>
                 <FormItem name={[field.name, 'images']} label="Images">
-                  <UploadImages type="wall-list" request={upload} data={{ folder: 'images/products/' }} />
+                  <UploadImages
+                    type="wall-list"
+                    request={upload}
+                    data={{ folder: 'images/products/' }}
+                  />
                 </FormItem>
               </Col>
             </Row>
             <Row gutter={16}>
               {product?.attributes?.length > 0 && (
                 <Col lg={22} md={22} sm={22} offset={1}>
-                  <Form.List name={[field.name, 'attributes']}>{AttributesList}</Form.List>
+                  <Form.List name={[field.name, 'attributes']}>
+                    {() => {
+                      return (
+                        <div>
+                          <Divider orientation="left">Attributes</Divider>
+                          {product?.attributes?.map((attribute: any, index: number) =>
+                            AttributeItem(attribute, index, field.name),
+                          )}
+                        </div>
+                      );
+                    }}
+                  </Form.List>
                 </Col>
               )}
             </Row>

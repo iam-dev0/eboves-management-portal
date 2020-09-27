@@ -122,6 +122,13 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
     });
   };
 
+  const nameHandler = () => {
+    const name = form.getFieldValue('name');
+    if (name)
+      form.setFieldsValue({
+        slug: `${name.replace(/[^\w]/gi, '-')  }_${  Math.floor(Math.random() * 100000)}`,
+      });
+  };
   const onFinishFailed = (error: any) => {
     form.scrollToField(error.errorFields[0].name, {
       behavior: 'smooth',
@@ -152,16 +159,20 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
                 label="Name"
                 rules={[{ required: true, message: 'Please enter name' }]}
               >
-                <Input placeholder="Please enter user name" />
+                <Input placeholder="Please enter user name" onBlur={nameHandler} />
               </Form.Item>
-              <Form.Item name="slug" label="Slug">
+              <Form.Item
+                name="slug"
+                label="Slug"
+                rules={[{ required: true, message: 'Please enter uniqe slug' }]}
+              >
                 <Input placeholder="Please here" />
               </Form.Item>
               <Form.Item name="categoryId" label="Parent Category">
                 <Cascader showSearch={{ filter }} options={categories} changeOnSelect />
               </Form.Item>
               <Form.Item name="image" label="Image">
-                <UploadImages request={upload} data={{ folder: 'images/categories/logo/' }}/>
+                <UploadImages request={upload} data={{ folder: 'images/categories/logo/' }} />
               </Form.Item>
               <Divider orientation="left">Meta Information</Divider>
 
@@ -181,7 +192,11 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
               </Form.Item>
               <Form.Item label="Story Cover">
                 <Form.Item name="storyCover" noStyle>
-                  <UploadImages wall request={upload} data={{ folder: 'images/categories/banners/' }}/>
+                  <UploadImages
+                    wall
+                    request={upload}
+                    data={{ folder: 'images/categories/banners/' }}
+                  />
                 </Form.Item>
               </Form.Item>
 

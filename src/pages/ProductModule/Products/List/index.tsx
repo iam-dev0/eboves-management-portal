@@ -40,6 +40,10 @@ const TableList: React.FC<any> = (props) => {
   useEffect(() => {
     dispatch({ type: 'brands/fetchBrands' });
     dispatch({ type: 'suppliers/fetchSuppliers' });
+
+    return () => {
+      dispatch({ type: 'products/reset' });
+    };
   }, []);
 
   const toggleProductActiveStatus = (id: number) => {
@@ -58,8 +62,6 @@ const TableList: React.FC<any> = (props) => {
       },
     });
   };
-
-
 
   const columns: ProColumns<ProductItem>[] = [
     {
@@ -183,7 +185,7 @@ const TableList: React.FC<any> = (props) => {
             overlay={
               <Menu>
                 <Menu.Item key="1" icon={<EditFilled />}>
-                <Link to={`/product-module/products/update/${record.id}`}> Edit</Link>
+                  <Link to={`/product-module/products/update/${record.id}`}> Edit</Link>
                 </Menu.Item>
                 <Menu.Item key="3" icon={<PlusOutlined />}>
                   <Link to={`products/${record.id}/variations/create`}>Add SKU</Link>
