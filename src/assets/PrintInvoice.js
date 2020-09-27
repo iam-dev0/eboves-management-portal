@@ -84,7 +84,7 @@ const PrintInvoice = (order = {}) => {
     ${order.shippingInfo.phone}
     </span></p>
     <p class="name-invoice"><span class="left"><b>Address</b>: 
-    ${order.shippingInfo.address} , ${order.shippingCharges.city?.name} 
+    ${order.shippingInfo.address} , ${order.shippingInfo.city?.name} 
      </span></p>
     <p class="name-invoice"><span class="left"><b>Invoice# 
     ${order.orderNumber}

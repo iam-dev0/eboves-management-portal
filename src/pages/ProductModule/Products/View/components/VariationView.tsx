@@ -17,7 +17,7 @@ const VariationView: React.FC<any> = ({
     sku,
     active,
     shortDescription,
-    attributeValues,
+    attributes,
     mainBarcode,
     mainImage,
     supplierPrice,
@@ -80,7 +80,7 @@ const VariationView: React.FC<any> = ({
               {shortDescription}
             </Descriptions.Item>
 
-            {attributeValues?.map((AV: any) =>
+            {attributes?.map((AV: any) =>
               AV.type !== 'image' ? (
                 <Descriptions.Item label={AV.name} span={3}>
                   {AV.ProductVariationAttributeValues.value} {AV.unit}
@@ -90,7 +90,9 @@ const VariationView: React.FC<any> = ({
                   <Descriptions.Item label={AV.name} span={2}>
                     {AV.ProductVariationAttributeValues.value}
                   </Descriptions.Item>
-                  <Descriptions.Item label="Alt">{AV.alt}</Descriptions.Item>
+                  <Descriptions.Item label="Alt">
+                    {AV.ProductVariationAttributeValues.alt}
+                  </Descriptions.Item>
                 </>
               ),
             )}
@@ -99,7 +101,10 @@ const VariationView: React.FC<any> = ({
 
         <Tabs.TabPane tab="Images" key="2">
           <div className={styles.imageGallery}>
-            <Gallery photos={[{src:mainImage},...photos]} onClick={(e, { photo }) => window.open(photo.src, '_blank')} />
+            <Gallery
+              photos={[{ src: mainImage }, ...photos]}
+              onClick={(e, { photo }) => window.open(photo.src, '_blank')}
+            />
           </div>
         </Tabs.TabPane>
       </Tabs>

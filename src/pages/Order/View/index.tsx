@@ -162,7 +162,7 @@ const OrderView: React.FC<any> = ({
                     {order?.shippingInfo?.email}
                   </Descriptions.Item>
                   <Descriptions.Item span={3} label="Delivery To">
-                    {order?.shippingInfo?.address}
+                    {order?.shippingInfo?.address}, {order?.shippingInfo?.city?.name}
                   </Descriptions.Item>
                 </Descriptions>
               </Card>
@@ -180,7 +180,7 @@ const OrderView: React.FC<any> = ({
                     Pkr.{order?.amount + order?.discountedAmount}
                   </Descriptions.Item>
                   <Descriptions.Item span={3} label="Shipment">
-                    Pkr.200.00
+                    {order?.shippingCharges}
                   </Descriptions.Item>
                   <Descriptions.Item span={3} label="GST">
                     {order?.tax}
@@ -195,7 +195,7 @@ const OrderView: React.FC<any> = ({
                     {order?.discountReason}
                   </Descriptions.Item>
                   <Descriptions.Item span={3} label="Payable">
-                    Pkr. {order?.amount + 200}
+                    Pkr. {order?.amount + order?.shippingCharges}
                   </Descriptions.Item>
                 </Descriptions>
               </Card>

@@ -137,7 +137,7 @@ const TableList: React.FC<any> = (props) => {
         <ProTable<CategoryItem>
           loading={loading}
           className="OuterTable"
-          headerTitle="Our Outlets"
+          headerTitle="Our Categories"
           childrenColumnName="childrens"
           actionRef={actionRef}
           rowKey="id"

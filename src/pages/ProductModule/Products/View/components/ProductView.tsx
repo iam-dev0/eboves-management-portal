@@ -21,6 +21,7 @@ const color = [
 const ProductView: React.FC<any> = ({
   product: {
     name,
+    mainImage,
     slug,
     sku,
     category,
@@ -36,8 +37,8 @@ const ProductView: React.FC<any> = ({
   const photos = images
     ? images?.map((image: { id: string; image: string }) => ({
         src: image.image,
-        width: Math.floor(Math.random() * 4) + 1,
-        height: Math.floor(Math.random() * 4) + 1,
+        width: 100,
+        height: 100,
       }))
     : [];
   return (
@@ -71,7 +72,7 @@ const ProductView: React.FC<any> = ({
       <Tabs tabPosition={tabPosition} className={styles.productTabs}>
         <Tabs.TabPane tab="Images" key="1">
           <div className={styles.imageGallery}>
-            <Gallery photos={photos} onClick={(e, { photo }) => window.open(photo.src, '_blank')} />
+            <Gallery  photos={[{src:mainImage},...photos]} onClick={(e, { photo }) => window.open(photo.src, '_blank')} />
           </div>
         </Tabs.TabPane>
         <Tabs.TabPane tab="Description" key="2">

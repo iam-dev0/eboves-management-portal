@@ -124,6 +124,14 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
     });
   };
 
+  const nameHandler = () => {
+    const name = form.getFieldValue('name');
+    if (name)
+      form.setFieldsValue({
+        slug: `${name.replace(/[^\w]/gi, '-')}_${Math.floor(Math.random() * 100000)}`,
+      });
+  };
+
   const onFinishFailed = (error: any) => {
     form.scrollToField(error.errorFields[0].name, {
       behavior: 'smooth',
@@ -154,6 +162,15 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
                     name="name"
                     label="Name"
                     rules={[{ required: true, message: 'it is required!' }]}
+                  >
+                    <Input placeholder="Enter here.." onBlur={nameHandler} />
+                  </FormItem>
+                </Col>
+                <Col lg={24} md={24} sm={24}>
+                  <FormItem
+                    name="slug"
+                    label="Slug"
+                    rules={[{ required: true, message: 'Please Enter A unique Slug' }]}
                   >
                     <Input placeholder="Enter here.." />
                   </FormItem>
@@ -244,7 +261,11 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
                 <Col lg={24} md={24} sm={24}>
                   <Form.Item label="Images">
                     <Form.Item name="images" noStyle>
-                      <UploadImages request={upload} data={{ folder: 'imagesproducts/' }} type="wall-list" />
+                      <UploadImages
+                        request={upload}
+                        data={{ folder: 'images/products/' }}
+                        type="wall-list"
+                      />
                     </Form.Item>
                   </Form.Item>
                 </Col>
