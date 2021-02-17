@@ -1,7 +1,16 @@
 # Management Port Eboves
 
-We use Ant Design pro to build this project so if you wanna look into that here is the link to it.
+We used Ant Design pro to build this project so if you wanna look into that here is the link to it.
+
 [https://github.com/ant-design/ant-design-pro](https://github.com/ant-design/ant-design-pro)
+
+
+**Online eCommerce Shop** https://github.com/awais000/eboves-website
+
+**Managment System** https://github.com/awais000/eboves-management-portal
+
+**Managment System** https://github.com/awais000/eboves-api
+
 
 ![image](https://fiverr-res.cloudinary.com/images/q_auto,f_auto/gigs2/178102961/original/54278d3183878b71d4d081d24e1a8f5a0431f3f8/create-a-custom-ecommerce-platform-and-management-system.png)
 
